@@ -3,7 +3,7 @@ import { IDefaultResponse } from './api.interfaces';
 const fs = (window as any).require('fs');
 const path = (window as any).require('path');
 
-class ApiServer {
+abstract class ApiServer {
     protected deleteFile(filename: string, path: string) : boolean {
         const fileToDelete = path + filename;
         if (!fs.existsSync(fileToDelete)) return true;
