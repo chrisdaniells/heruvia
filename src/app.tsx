@@ -12,7 +12,7 @@ import Header from '@components/Header';
 ReactDOM.render((
     <ThemeProvider theme={theme}>
         <Router>
-        <   Header />
+        <Header />
             <Switch>
                 <Route path='/languages' component={Languages} />
                 <Route path='/wiki' component={Wiki} />
