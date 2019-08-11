@@ -1,0 +1,35 @@
+
+
+enum SubCategories {
+    Biographies = "biographies",
+    Cultures = "cultures",
+    Linguistics = "linguistics",
+    Literature = "literature",
+    Politics = "politics",
+    Races = "races",
+    Science = "science",
+    Technology = "technology",
+    Theology = "theology",
+    Archiecture = "architecture",
+    Clothing = "clothing",
+    FoodAndDrink = "food and drink",
+    Objects = "objects",
+    SpecialItems = "special items",
+    Weapons = "weapons",
+    Behemoths = "behemoths",
+    Fauna = "fauna",
+    Flora = "flora",
+    Cities = "cities",
+    Mountains = "mountains",
+    Places = "places",
+    Regions = "regions",
+    WaterBodies = "water bodies",
+    TheAgeOfAwakening = "the age of awakening",
+    TheAgeOfBeginnings = "the age of beginnings",
+    TheAgeOfUncertainty = "the age of uncertainty",
+    TheAgeOfEmpires = "the age of empires",
+    TheAgeOfRaces = "the age of races",
+    TheAgeOfCreation = "the age of creation",
+}
+
+export { SubCategories };
