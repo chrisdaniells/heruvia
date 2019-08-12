@@ -12,6 +12,7 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
+    ListSubheader,
     Toolbar,
 } from '@material-ui/core';
 import { 
@@ -57,7 +58,7 @@ export default class Header extends React.Component<any, IHeaderState> {
                             <Grid item>
                                 <IconButton 
                                     edge="start" 
-                                    color="inherit" 
+                                    color="primary" 
                                     aria-label="menu"
                                     onClick={this.toggleDrawer}
                                 >
@@ -75,7 +76,19 @@ export default class Header extends React.Component<any, IHeaderState> {
                     open={this.state.drawerOpen}
                     onClose={this.toggleDrawer}
                 >
-                    <List style={{ width: 250 }}>
+                    <List
+                        subheader={
+                            <ListSubheader 
+                                component="div"
+                                style={{
+                                    fontSize: "1rem"
+                                }}
+                            >
+                                Applications
+                            </ListSubheader>
+                        }
+                        style={{ width: 250 }}
+                    >
                         <ListItem 
                             button
                             component={Link}

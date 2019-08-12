@@ -148,7 +148,7 @@ export default class SearchBox extends React.Component<any, ISearchBoxState> {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchIcon />
+                                <SearchIcon color="primary"/>
                             </InputAdornment>
                         )
                     }}
