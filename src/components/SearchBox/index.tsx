@@ -3,32 +3,27 @@ import React from 'react';
 import { SearchApiClient, WikiApiClient } from '@api';
 import { DataSources } from '@enums';
 
-import { 
-    Card, CardContent, CardMedia,
+import SearchDrawer from '@components/SearchBox/SearchDrawer';
+
+import {
     Grid,
+    InputAdornment,
     List, ListItem,
     TextField,
 } from '@material-ui/core';
-// import { } from '@material-ui/icons';
+import { Search as SearchIcon } from '@material-ui/icons';
 import { styled } from '@material-ui/styles';
 
 interface ISearchBoxState {
     resultsTimeStamp: number;
     searchTerm: string;
     searchResults: any[];
+    drawerOpen: boolean;
 }
 
 const SearchInput = styled(TextField)({
-    marginTop: 9,
+    marginTop: 8,
     background: "white",
-});
-
-const SearchResult = styled(Card)({
-    position: "absolute",
-    right: 24,
-    width: "30%",
-    maxWidth: 500,
-    minWidth: 350
 });
 
 export default class SearchBox extends React.Component<any, ISearchBoxState> {
@@ -36,6 +31,8 @@ export default class SearchBox extends React.Component<any, ISearchBoxState> {
     private WikiApiClient: WikiApiClient;
     private SearchApiClient: SearchApiClient;
 
+    private searchTimer: any;
+    
     constructor(props: any, state: ISearchBoxState) {
         super(props, state);
 
@@ -46,40 +43,59 @@ export default class SearchBox extends React.Component<any, ISearchBoxState> {
             resultsTimeStamp: 0,
             searchTerm: "",
             searchResults: [],
+            drawerOpen: false,
         }
 
         this.handleSearchInput = this.handleSearchInput.bind(this);
         this.renderSearchResults = this.renderSearchResults.bind(this);
+        this.onDrawerClose = this.onDrawerClose.bind(this);
+        this.handleInputClick = this.handleInputClick.bind(this);
     }
 
     componentDidMount() {
-        const props = ["id", "url", "title", "preface", "images"];
-        const getAllPagesResponse = this.WikiApiClient.getAllPages();
+        const WikiSourceConfig = this.WikiApiClient.getSourceConfig();
 
         this.SearchApiClient.setSource(
-            DataSources.Wiki, 
-            getAllPagesResponse.status ? getAllPagesResponse.data : [],
-            "title", 
-            props
+            WikiSourceConfig.name, 
+            WikiSourceConfig.files,
+            WikiSourceConfig.target, 
+            WikiSourceConfig.props,
         );
     }
 
     handleSearchInput(e: any): void {
+        clearTimeout(this.searchTimer);
         const searchTerm = e.currentTarget.value;
-        let { resultsTimeStamp } = { ...this.state };
-        const getAllPagesResponse = this.WikiApiClient.getAllPages();
 
-        if (Date.now() - resultsTimeStamp > 30000 && getAllPagesResponse.status) {
-            resultsTimeStamp = Date.now();
-            this.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
+        this.searchTimer = setTimeout(() => {
+            let { resultsTimeStamp } = { ...this.state };
+            const getAllPagesResponse = this.WikiApiClient.getAllPages();
+    
+            if (Date.now() - resultsTimeStamp > 30000 && getAllPagesResponse.status) {
+                resultsTimeStamp = Date.now();
+                this.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
+            }
+    
+            const searchResults = searchTerm.length >= 2 ?
+                this.SearchApiClient.getSearchResults(searchTerm) : [];
+    
+            this.setState({
+                searchTerm,
+                searchResults,
+                drawerOpen: (searchResults.length > 0 ? true : false)
+            });
+        }, 100);
+    }
+
+    handleInputClick() : void {
+        if (this.state.searchResults.length > 0 && !this.state.drawerOpen) {
+            this.setState({ drawerOpen: true });
         }
+    }
 
-        const searchResults = searchTerm.length >= 2 ?
-            this.SearchApiClient.getSearchResults(searchTerm) : [];
-
+    onDrawerClose() : void {
         this.setState({
-            searchTerm,
-            searchResults,
+            drawerOpen: false
         });
     }
 
@@ -90,7 +106,7 @@ export default class SearchBox extends React.Component<any, ISearchBoxState> {
             let sourceResults: any[] = [];
             source.data.forEach((result: any) => {
                 sourceResults.push(                
-                    <ListItem key={result.id} style={{  }}>
+                    <ListItem key={result.id}>
                         <Grid container alignItems="flex-start" justify="flex-end" direction="row">
                             <Grid item>
                             {result.title}
@@ -108,15 +124,17 @@ export default class SearchBox extends React.Component<any, ISearchBoxState> {
             });
 
             results.push(
-                <List key={source.name}>{sourceResults}</List>
+                <List key={source.name}>{sourceResults}</List>   
             );
         });
+
         return(
-            <SearchResult square> 
-                <List>
-                    {results}
-                </List>
-            </SearchResult>
+            <SearchDrawer 
+                results={results} 
+                open={this.state.drawerOpen}
+                onOpen={() => {}}
+                onClose={this.onDrawerClose}
+            />
         );
     }
 
@@ -126,10 +144,17 @@ export default class SearchBox extends React.Component<any, ISearchBoxState> {
                 <SearchInput
                     placeholder="Search…"
                     onChange={e => this.handleSearchInput(e)}
+                    onClick={this.handleInputClick}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        )
+                    }}
                 />
-                { this.state.searchResults.length > 0 &&
-                    this.renderSearchResults()
-                }
+
+                    {this.renderSearchResults()}
             </div>
         )
     }

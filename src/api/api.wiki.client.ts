@@ -1,7 +1,9 @@
 import { WikiApiServer } from './api.wiki.server';
 
 import { IDefaultResponse } from './api.interfaces';
+import { ISource } from './api.search.client';
 import { IPage } from '@interfaces';
+import { DataSources } from '@enums';
 
 class WikiApiClient {
     private WikiApiServer: WikiApiServer;
@@ -32,6 +34,16 @@ class WikiApiClient {
 
     public uploadImages(images: string[]) : IDefaultResponse {
         return this.WikiApiServer.uploadImages(images);
+    }
+
+    public getSourceConfig() : ISource {
+        const res = this.getAllPages();
+        return {
+            name: DataSources.Wiki,
+            files: res.status ? res.data : [],
+            target: "title",
+            props: ["id", "url", "title", "preface", "images"],
+        }
     }
 }
 

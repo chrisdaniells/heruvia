@@ -2,7 +2,7 @@ import FuzzySearch from 'fuzzy-search';
 
 import { DataSources } from '@enums';
 
-interface ISource {
+export interface ISource {
     name: DataSources;
     files: any[];
     target: string;
@@ -74,10 +74,13 @@ class SearchApiClient {
 
         // For Each Source
         for (const [name, searcher] of Object.entries(this.searchers)) {
-            results.push({
-                name,
-                data: searcher.search(value).slice(0,4), 
-            });
+            const data = searcher.search(value).slice(0,4);
+            if (data.length > 0) {
+                results.push({
+                    name,
+                    data, 
+                });
+            }
         }
         
         return results;

@@ -75,7 +75,7 @@ export default class Header extends React.Component<any, IHeaderState> {
                     open={this.state.drawerOpen}
                     onClose={this.toggleDrawer}
                 >
-                    <List>
+                    <List style={{ width: 250 }}>
                         <ListItem 
                             button
                             component={Link}
