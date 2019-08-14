@@ -1,7 +1,7 @@
 import React from 'react';
 
-import SearchDrawer from '@components/SearchBox/SearchDrawer';
-import ResultsTray from '@components/SearchBox/ResultsTray';
+import SearchDrawer from '@components/global/SearchBox/SearchDrawer';
+import ResultsTray from '@components/global/SearchBox/ResultsTray';
 
 import {
     InputAdornment,

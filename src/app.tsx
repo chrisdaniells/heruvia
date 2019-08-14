@@ -12,7 +12,7 @@ import Wiki from '@apps/Wiki';
 import Languages from '@apps/Languages';
 import Timeline from '@apps/Timeline';
 
-import Header from '@components/Header';
+import Header from '@components/global/Header';
 
 const wikiApiClient = new WikiApiClient();
 const searchApiClient = new SearchApiClient();

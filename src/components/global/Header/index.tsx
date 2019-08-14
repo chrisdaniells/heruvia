@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import config from '@config';
 import { DataSources } from '@enums';
 
-import SearchBox from '@components/SearchBox';
+import SearchBox from '@components/global/SearchBox';
 
 import { 
     AppBar, 
