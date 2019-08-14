@@ -9,6 +9,7 @@ const styles = makeStyles({
     },
     paper: {
         marginTop: 49,
+        padding: 20,
     },
     backdrop: { 
         top: 49
@@ -18,7 +19,7 @@ const styles = makeStyles({
 export default function SearchDrawer(props: any) {
     const {
         open, 
-        results,
+        children,
         onClose,
         onOpen,
     } = props; 
@@ -31,7 +32,7 @@ export default function SearchDrawer(props: any) {
             onClose={onClose}
             onOpen={onOpen}
             style={{
-                zIndex: 1099
+                zIndex: 1099,
             }}
             classes={{
                 root: classes.root,
@@ -47,7 +48,7 @@ export default function SearchDrawer(props: any) {
                 }
             }}
         >
-            {results}
+            {children}
         </SwipeableDrawer>
     );
 }

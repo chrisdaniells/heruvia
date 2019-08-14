@@ -1,14 +1,14 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import { grey } from '@material-ui/core/colors';
+
+import config from '@config';
 
 export default createMuiTheme({
     palette: {
         primary: {
-            main: '#ab003c'
-        }
+            main: config.styles.colours.primary
+        },
     },
     typography: {
         fontFamily: 'Lora',
-        
     }
 });
