@@ -13,7 +13,7 @@ const config: { [key: string] : any } = {
     },
     routes: {
         wiki: {
-            page: '/wiki/page'
+            page: '/wiki/page',
         }
     },
     categories: categoriesConfig,

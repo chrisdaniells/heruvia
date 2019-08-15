@@ -1,5 +1,14 @@
 
 
+import {
+    Person, Group, RecordVoiceOver, LocalLibrary, Gavel,
+    Fingerprint, Functions, DeviceHub, AccountBalance, Domain, 
+    Texture, Restaurant, VpnKey, Stars, Colorize, Android,
+    Pets, LocalFlorist, LocationCity, Landscape, Place,
+    Map as MapIcon, Waves, Visibility, Build, Loop, BrightnessLow,
+    PanTool, Palette,
+} from '@material-ui/icons';
+
 enum SubCategories {
     Biographies = "biographies",
     Cultures = "cultures",
@@ -32,4 +41,36 @@ enum SubCategories {
     TheAgeOfCreation = "the age of creation",
 }
 
-export { SubCategories };
+const SubCategoryIcons: { [key: string ]: any } = {
+    Biographies: Person,
+    Cultures: Group,
+    Linguistics: RecordVoiceOver,
+    Literature: LocalLibrary,
+    Politics: Gavel,
+    Races: Fingerprint,
+    Science: Functions,
+    Technology: DeviceHub,
+    Theology: AccountBalance,
+    Archiecture: Domain,
+    Clothing: Texture,
+    FoodAndDrink: Restaurant,
+    Objects: VpnKey,
+    SpecialItems: Stars,
+    Weapons: Colorize,
+    Behemoths: Android,
+    Fauna: Pets,
+    Flora: LocalFlorist,
+    Cities: LocationCity,
+    Mountains: Landscape,
+    Places: Place,
+    Regions: MapIcon,
+    WaterBodies: Waves,
+    TheAgeOfAwakening: Visibility,
+    TheAgeOfBeginnings: Build,
+    TheAgeOfUncertainty: Loop,
+    TheAgeOfEmpires: BrightnessLow,
+    TheAgeOfRaces: PanTool,
+    TheAgeOfCreation: Palette,
+}
+
+export { SubCategories, SubCategoryIcons };

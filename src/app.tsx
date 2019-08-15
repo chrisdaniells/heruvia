@@ -27,6 +27,7 @@ ReactDOM.render((
             <Switch>
                 <Route path='/timeline' component={Timeline} />
                 <Route path='/languages' component={Languages} />
+                <Route path='/wiki/list/:attribute/:value' component={Wiki} />
                 <Route 
                     path={['/', '/wiki', config.routes.wiki.page + '/:id']}
                     render={(props) => (

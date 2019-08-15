@@ -1,5 +1,5 @@
 export { Categories } from './Categories';
-export { SubCategories } from './SubCategories';
+export { SubCategories, SubCategoryIcons } from './SubCategories';
 
 export enum DataSources {
     Wiki = "wiki",
