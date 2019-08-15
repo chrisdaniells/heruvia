@@ -13,6 +13,6 @@ export interface IPage {
     details: object[];
     body: string;
     preface: string;
-    date_created: string;
-    date_last_updated: string;
+    date_created: number;
+    date_last_updated: number;
 }

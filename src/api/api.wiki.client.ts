@@ -8,12 +8,22 @@ import { DataSources } from '@enums';
 class WikiApiClient {
     private WikiApiServer: WikiApiServer;
 
+    private cacheTimeStamp: number;
+    private cachedAllPagesResponse: IDefaultResponse;
+    private cacheTime: number;
+
     constructor() {
         this.WikiApiServer = new WikiApiServer();
+
+        this.cacheTimeStamp = 0;
+        this.cacheTime = 10000
     }
 
     public getAllPages() : IDefaultResponse {
-        return this.WikiApiServer.getAllPages();
+        if (Date.now() - this.cacheTimeStamp > this.cacheTime) {
+            this.cachedAllPagesResponse = this.WikiApiServer.getAllPages();
+        }
+        return this.cachedAllPagesResponse;
     }
     
     public getPageById(id: string) : IDefaultResponse {
@@ -46,7 +56,7 @@ class WikiApiClient {
         }
     }
 
-    public getReducedPrefaceText(preface: string, limit: number) {
+    static getReducedPrefaceText(preface: string, limit: number) {
         let text = '';
         const div = document.createElement('div');
         div.innerHTML = preface;

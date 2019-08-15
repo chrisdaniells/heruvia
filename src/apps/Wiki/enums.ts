@@ -1,4 +1,5 @@
-export enum HomepageTabValues {
+export enum PageListFilters {
     All = "All Pages",
-    Recent = "Recently Changed",
+    RecentlyModified = "Recently Modified",
+    RecentlyCreated = "Recently Created",
 }

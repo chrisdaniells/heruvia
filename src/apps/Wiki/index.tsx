@@ -4,9 +4,11 @@ import { SearchApiClient, WikiApiClient } from '@api';
 import config from '@config';
 
 import { Paper, Tab, Tabs } from '@material-ui/core';
-import { HomepageTabValues } from '@apps/Wiki/enums';
+import { styled } from '@material-ui/styles';
+import { PageListFilters } from '@apps/Wiki/enums';
 
 import DisplayWrap from '@components/global/DisplayWrap';
+import PageList from '@components/wiki/PageList';
 
 interface IWikiAppProps {
     SearchApiClient: SearchApiClient;
@@ -14,22 +16,55 @@ interface IWikiAppProps {
 }
 
 interface IWikiAppState {
-    selectedTab: HomepageTabValues;
+    selectedPagesTab: number;
 }
+
+const FilterPaper = styled(Paper)({
+    maxHeight: 600,
+    overflowY: "auto",
+    marginBottom: config.styles.spacing.default
+});
 
 export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppState> {
     constructor(props: IWikiAppProps, state: IWikiAppState) {
         super(props, state);
 
         this.state = {
-            selectedTab: HomepageTabValues.All
+            selectedPagesTab: 0
         }
 
         this.handleTabChange = this.handleTabChange.bind(this);
+        this.filterPages = this.filterPages.bind(this);
     }
 
-    handleTabChange(_e: any, selectedTab: any) {
-        this.setState({ selectedTab })
+    handleTabChange(_e: any, selectedPagesTab: any) {
+        this.setState({ selectedPagesTab })
+    }
+
+    filterPages(filter: PageListFilters, quantity?: number) {
+        const pagesResponse = this.props.WikiApiClient.getAllPages();
+        let pages = pagesResponse.data;
+        
+        switch(filter) {
+            case PageListFilters.RecentlyModified:
+                    pages.sort((a: any, b: any) => {
+                        if (a.last_updated > b.last_updated) return -1;
+                        else if (a.last_updated < b.last_updated) return +1;
+                        else return 0;  
+                    });
+                break;
+            case PageListFilters.RecentlyCreated:
+                    pages.sort((a: any, b: any) => {
+                        if (a.date_created > b.date_created) return -1;
+                        else if (a.date_created < b.date_created) return +1;
+                        else return 0;  
+                    });
+                break;
+        }
+
+        if (quantity !== undefined) pages = pages.splice(0, quantity);
+
+        return pages;
     }
 
     render() {
@@ -40,22 +75,43 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
                     marginTop: 100,
                 }}
             >
-                <Paper square>
+                <FilterPaper square className="u-height-transition">
                     <Tabs
-                        value={this.state.selectedTab}
+                        value={this.state.selectedPagesTab}
                         indicatorColor="primary"
                         textColor="primary"
                         onChange={this.handleTabChange}
                         aria-label="disabled tabs example"
                     >
-                        <Tab label="Active" />
-                        <Tab label="Disabled" disabled />
-                        <Tab label="Active" />
+                        <Tab label={PageListFilters.RecentlyModified} />
+                        <Tab label={PageListFilters.RecentlyCreated} />
+                        <Tab label={PageListFilters.All} />
                     </Tabs>
-                        <DisplayWrap show={this.state.selectedTab === HomepageTabValues.All}>
-                            
+                        <DisplayWrap show={this.state.selectedPagesTab === 0}>
+                            <PageList pages={this.filterPages(PageListFilters.RecentlyModified, 5)} />
                         </DisplayWrap>
-                </Paper>
+                        <DisplayWrap show={this.state.selectedPagesTab === 1}>
+                            <PageList pages={this.filterPages(PageListFilters.RecentlyCreated, 5)} />
+                        </DisplayWrap>
+                        <DisplayWrap show={this.state.selectedPagesTab === 2}>
+                            <PageList pages={this.filterPages(PageListFilters.All)} />
+                        </DisplayWrap>
+                </FilterPaper>
+
+                <FilterPaper square className="u-height-transition">
+                    <Tabs
+                        value={0}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        onChange={() => {}}
+                        aria-label="disabled tabs example"
+                    >
+                        <Tab label="Categories" />
+                    </Tabs>
+                        <div>
+                            Categories
+                        </div>
+                </FilterPaper>
             </div>
         )
     }

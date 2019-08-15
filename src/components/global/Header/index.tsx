@@ -30,7 +30,6 @@ interface IHeaderState {
     searchDrawerOpen: boolean;
     searchTerm: string;
     searchResults: any[];
-    resultsTimeStamp: number;
 }
 
 export default class Header extends React.Component<any, IHeaderState> {
@@ -43,7 +42,6 @@ export default class Header extends React.Component<any, IHeaderState> {
         this.state = {
             drawerOpen: false,
             searchDrawerOpen: false,
-            resultsTimeStamp: 0,
             searchTerm: "",
             searchResults: [],
         }
@@ -77,13 +75,9 @@ export default class Header extends React.Component<any, IHeaderState> {
         const searchTerm = e.currentTarget.value;
 
         this.searchTimer = setTimeout(() => {
-            let { resultsTimeStamp } = { ...this.state };
             const getAllPagesResponse = this.props.WikiApiClient.getAllPages();
     
-            if (Date.now() - resultsTimeStamp > 30000 && getAllPagesResponse.status) {
-                resultsTimeStamp = Date.now();
-                this.props.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
-            }
+            this.props.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
     
             const searchResults = searchTerm.length >= 2 ?
                 this.props.SearchApiClient.getSearchResults(searchTerm) : [];

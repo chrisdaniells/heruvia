@@ -14,12 +14,9 @@ interface IResultsTrayProps {
 interface IResultsTrayState {}
 
 export default class ResultsTray extends React.Component<IResultsTrayProps, IResultsTrayState> {
-    private WikiApiClient: WikiApiClient;
 
     constructor(props: IResultsTrayProps, state: IResultsTrayState) {
         super(props, state);
-
-        this.WikiApiClient = new WikiApiClient();
 
         this.renderSourceResults = this.renderSourceResults.bind(this);
     }
@@ -83,7 +80,7 @@ export default class ResultsTray extends React.Component<IResultsTrayProps, IRes
                                 <p style={{
                                     fontSize: 12,
                                     margin: config.styles.spacing.thin + 'px 0 0',
-                                }}>{this.WikiApiClient.getReducedPrefaceText(result.preface, 100)}</p>
+                                }}>{WikiApiClient.getReducedPrefaceText(result.preface, 100)}</p>
                             </div>
                             <div style={{ clear: 'both' }} />
                         </Link>

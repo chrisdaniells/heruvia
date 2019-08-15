@@ -27,17 +27,16 @@ ReactDOM.render((
             <Switch>
                 <Route path='/timeline' component={Timeline} />
                 <Route path='/languages' component={Languages} />
-                <Route path={config.routes.wiki.page + '/:id'} component={Wiki} />
                 <Route 
-                    path='/wiki'
-                    render={() => (
+                    path={['/', '/wiki', config.routes.wiki.page + '/:id']}
+                    render={(props) => (
                         <Wiki
+                            {...props}
                             WikiApiClient={wikiApiClient}
                             SearchApiClient={searchApiClient}
                         />
                      )} 
                 />
-                <Route path='/' component={Wiki} />
                 <Route component={Wiki} />
             </Switch>
         </Router>
