@@ -22,3 +22,7 @@ body {
 .u-height-transition {
     transition: maxHeight .3s ease-in-out;
 }
+
+a:hover {
+    color: #790101 !important;
+}

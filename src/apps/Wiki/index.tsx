@@ -1,10 +1,12 @@
 import React from 'react';
 
 import { SearchApiClient, WikiApiClient } from '@api';
+import { IDefaultResponse } from '@api';
 import config from '@config';
 import { Categories, SubCategories} from '@enums';
 
-import { 
+import {
+    Button,
     List,
     Paper,
     Tab,
@@ -14,7 +16,7 @@ import { PageListFilters } from '@apps/Wiki/enums';
 
 import DisplayWrap from '@components/global/DisplayWrap';
 import PageList from '@components/wiki/PageList';
-import SubcategoryItem from '@components/wiki/SubcategoryItem';
+import SubcategoryItem from '@components/wiki/SubcategoryItems';
 
 interface IWikiAppProps {
     SearchApiClient: SearchApiClient;
@@ -24,6 +26,7 @@ interface IWikiAppProps {
 interface IWikiAppState {
     selectedPagesTab: number;
     selectedCategoryTab: number;
+    pages: any[];
 }
 
 const paperStyles = {
@@ -33,12 +36,16 @@ const paperStyles = {
 }
 
 export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppState> {
+
     constructor(props: IWikiAppProps, state: IWikiAppState) {
         super(props, state);
+
+        const pagesResponse = this.props.WikiApiClient.getAllPages();
 
         this.state = {
             selectedPagesTab: 0,
             selectedCategoryTab: 0,
+            pages: pagesResponse.data,
         }
 
         this.handlePageTabChange = this.handlePageTabChange.bind(this);
@@ -57,9 +64,8 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
     }
 
     filterPages(filter: PageListFilters, quantity?: number) {
-        const pagesResponse = this.props.WikiApiClient.getAllPages();
-        let pages = pagesResponse.data;
-        
+        let pages = [ ...this.state.pages ];
+
         switch(filter) {
             case PageListFilters.RecentlyModified:
                     pages.sort((a: any, b: any) => {
@@ -118,12 +124,17 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
 
     render() {
         return (
-            <div 
-                style={{
-                    ...config.styles.container,
-                    marginTop: 100,
-                }}
-            >
+            <div style={{ ...config.styles.container, marginTop: 100, }}>
+                <div style={{ textAlign: "right", marginBottom: config.styles.spacing.default }}>
+                    <Button 
+                        variant="contained" 
+                        color="primary"
+                        style={{
+                            borderRadius: 0
+                        }}
+                    >Create Page</Button>
+                </div>
+
                 <Paper square className="u-height-transition">
                     <Tabs
                         value={this.state.selectedPagesTab}
@@ -134,7 +145,7 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
                     >
                         <Tab label={PageListFilters.RecentlyModified} />
                         <Tab label={PageListFilters.RecentlyCreated} />
-                        <Tab label={PageListFilters.All} />
+                        <Tab label={PageListFilters.All + ' (' + this.state.pages.length + ')'} />
                     </Tabs>
                         <DisplayWrap 
                             show={this.state.selectedPagesTab === 0}

@@ -8,9 +8,10 @@ import config from './config';
 
 import { SearchApiClient, WikiApiClient } from '@api';
 
-import Wiki from '@apps/Wiki';
-import Languages from '@apps/Languages';
-import Timeline from '@apps/Timeline';
+import WikiApp from '@apps/Wiki';
+import LanguagesApp from '@apps/Languages';
+import NotesApp from '@apps/Notes';
+import TimelineApp from '@apps/Timeline';
 
 import Header from '@components/global/Header';
 
@@ -25,20 +26,21 @@ ReactDOM.render((
             SearchApiClient={searchApiClient}
         />
             <Switch>
-                <Route path='/timeline' component={Timeline} />
-                <Route path='/languages' component={Languages} />
-                <Route path='/wiki/list/:attribute/:value' component={Wiki} />
+                <Route path='/notes' component={NotesApp} />
+                <Route path='/timeline' component={TimelineApp} />
+                <Route path='/languages' component={LanguagesApp} />
+                <Route path='/wiki/list/:attribute/:value' component={WikiApp} />
                 <Route 
                     path={['/', '/wiki', config.routes.wiki.page + '/:id']}
                     render={(props) => (
-                        <Wiki
+                        <WikiApp
                             {...props}
                             WikiApiClient={wikiApiClient}
                             SearchApiClient={searchApiClient}
                         />
                      )} 
                 />
-                <Route component={Wiki} />
+                <Route component={WikiApp} />
             </Switch>
         </Router>
     </ThemeProvider>

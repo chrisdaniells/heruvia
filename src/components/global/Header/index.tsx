@@ -18,7 +18,8 @@ import {
     ListSubheader,
     Toolbar,
 } from '@material-ui/core';
-import { 
+import {
+    Book as BookIcon,
     Chat as ChatIcon, 
     Menu as MenuIcon, 
     Public as PublicIcon,
@@ -185,6 +186,16 @@ export default class Header extends React.Component<any, IHeaderState> {
                                 <TimelineIcon />
                             </ListItemIcon>
                             <ListItemText primary="Timeline" />
+                        </ListItem>
+                        <ListItem
+                            button
+                            component={Link}
+                            to="/notes"
+                        >
+                            <ListItemIcon>
+                                <BookIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Notes" />
                         </ListItem>
                     </List>
                 </Drawer>

@@ -20,8 +20,9 @@ class WikiApiClient {
     }
 
     public getAllPages() : IDefaultResponse {
-        if (Date.now() - this.cacheTimeStamp > this.cacheTime) {
+        if (Date.now() - this.cacheTimeStamp > this.cacheTime || this.cachedAllPagesResponse === undefined) {
             this.cachedAllPagesResponse = this.WikiApiServer.getAllPages();
+            this.cacheTimeStamp = Date.now();
         }
         return this.cachedAllPagesResponse;
     }
