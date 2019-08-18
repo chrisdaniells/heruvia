@@ -13,7 +13,9 @@ const config: { [key: string] : any } = {
     },
     routes: {
         wiki: {
-            page: '/wiki/page/',
+            root: '/wiki',
+            page: '/wiki/page',
+            edit: '/wiki/edit',
         }
     },
     categories: categoriesConfig,

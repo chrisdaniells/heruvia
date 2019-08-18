@@ -43,7 +43,7 @@ export default class Header extends React.Component<any, IHeaderState> {
         this.state = {
             drawerOpen: false,
             searchDrawerOpen: false,
-            searchTerm: "",
+            searchTerm: '',
             searchResults: [],
         }
 
@@ -107,21 +107,21 @@ export default class Header extends React.Component<any, IHeaderState> {
         return (
             <div>
                 <AppBar 
-                    position="fixed"
+                    position='fixed'
                     style={{
-                        background: "white"
+                        background: 'white'
                     }}
                 >
                     <Toolbar 
-                        variant="dense" 
+                        variant='dense' 
                         style={config.styles.container}
                     >
-                        <Grid container justify="space-between">
+                        <Grid container justify='space-between'>
                             <Grid item>
                                 <IconButton 
-                                    edge="start" 
-                                    color="primary" 
-                                    aria-label="menu"
+                                    edge='start' 
+                                    color='primary' 
+                                    aria-label='menu'
                                     onClick={this.toggleDrawer}
                                 >
                                     <MenuIcon />
@@ -147,9 +147,9 @@ export default class Header extends React.Component<any, IHeaderState> {
                     <List
                         subheader={
                             <ListSubheader 
-                                component="div"
+                                component='div'
                                 style={{
-                                    fontSize: "1rem"
+                                    fontSize: '1rem'
                                 }}
                             >
                                 Applications
@@ -160,42 +160,42 @@ export default class Header extends React.Component<any, IHeaderState> {
                         <ListItem 
                             button
                             component={Link}
-                            to="/wiki"
+                            to='/wiki'
                         >
                             <ListItemIcon>
                                 <PublicIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Encyclopedia" />
+                            <ListItemText primary='Encyclopedia' />
                         </ListItem>
                         <ListItem
                             button
                             component={Link}
-                            to="/languages"
+                            to='/languages'
                         >
                             <ListItemIcon>
                                 <ChatIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Languages" />
+                            <ListItemText primary='Languages' />
                         </ListItem>
                         <ListItem
                             button
                             component={Link}
-                            to="/timeline"
+                            to='/timeline'
                         >
                             <ListItemIcon>
                                 <TimelineIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Timeline" />
+                            <ListItemText primary='Timeline' />
                         </ListItem>
                         <ListItem
                             button
                             component={Link}
-                            to="/notes"
+                            to='/notes'
                         >
                             <ListItemIcon>
                                 <BookIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Notes" />
+                            <ListItemText primary='Notes' />
                         </ListItem>
                     </List>
                 </Drawer>

@@ -20,7 +20,7 @@ interface ISearchBoxProps {
 
 const SearchInput = styled(TextField)({
     marginTop: 8,
-    background: "white",
+    background: 'white',
 });
 
 export default class SearchBox extends React.Component<ISearchBoxProps, any> {
@@ -33,13 +33,13 @@ export default class SearchBox extends React.Component<ISearchBoxProps, any> {
         return(
             <div>
                 <SearchInput
-                    placeholder="Search…"
+                    placeholder='Search…'
                     onChange={e => this.props.handleSearchInput(e as any)}
                     onClick={this.props.handleInputClick}
                     InputProps={{
                         startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon color="primary"/>
+                            <InputAdornment position='start'>
+                                <SearchIcon color='primary'/>
                             </InputAdornment>
                         )
                     }}

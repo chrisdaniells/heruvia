@@ -1,7 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-import { SearchApiClient, WikiApiClient } from '@api';
-import { IDefaultResponse } from '@api';
+import { SearchApiClient, WikiApiClient, IDefaultResponse } from '@api';
 import config from '@config';
 import { Categories, SubCategories} from '@enums';
 
@@ -12,6 +12,7 @@ import {
     Tab,
     Tabs,
 } from '@material-ui/core';
+import { AddCircleOutline as AddIcon } from '@material-ui/icons';
 import { PageListFilters } from '@apps/Wiki/enums';
 
 import DisplayWrap from '@components/global/DisplayWrap';
@@ -30,9 +31,13 @@ interface IWikiAppState {
 }
 
 const paperStyles = {
-    overflowY: "auto",
+    overflowY: 'auto',
     marginBottom: config.styles.spacing.default,
     maxHeight: 600,
+}
+
+const tabStyles = {
+    fontSize: 15,
 }
 
 export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppState> {
@@ -40,7 +45,7 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
     constructor(props: IWikiAppProps, state: IWikiAppState) {
         super(props, state);
 
-        const pagesResponse = this.props.WikiApiClient.getAllPages();
+        const pagesResponse: IDefaultResponse = this.props.WikiApiClient.getAllPages();
 
         this.state = {
             selectedPagesTab: 0,
@@ -117,35 +122,41 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
     renderCategoriesTabs() {
         let categories: any[] = [];
         Object.keys(config.categories).forEach((category: Categories, index: number) => {
-            categories.push(<Tab label={category} key={category} />)
+            categories.push(<Tab label={category} key={category} style={tabStyles} />)
         });
         return categories;
     }
 
     render() {
+        console.log(this.props);
         return (
             <div style={{ ...config.styles.container, marginTop: 100, }}>
-                <div style={{ textAlign: "right", marginBottom: config.styles.spacing.default }}>
-                    <Button 
-                        variant="contained" 
-                        color="primary"
+                <div style={{ textAlign: 'right', marginBottom: config.styles.spacing.default }}>
+                    <Button
+                        component={Link}
+                        to={config.routes.wiki.edit}
+                        variant='contained' 
+                        color='primary'
+                        className='Wiki_CreatePageButton'
                         style={{
-                            borderRadius: 0
+                            borderRadius: 0,
+                            color: 'white !important',
+                            //padding: config.styles.spacing.thin + 'px 16px'
                         }}
-                    >Create Page</Button>
+                    ><AddIcon style={{ marginRight: config.styles.spacing.thin }}/>New Page</Button>
                 </div>
 
-                <Paper square className="u-height-transition">
+                <Paper square className='u-height-transition'>
                     <Tabs
                         value={this.state.selectedPagesTab}
-                        indicatorColor="primary"
-                        textColor="primary"
+                        indicatorColor='primary'
+                        textColor='primary'
                         onChange={this.handlePageTabChange}
-                        aria-label="disabled tabs example"
+                        aria-label='disabled tabs example'
                     >
-                        <Tab label={PageListFilters.RecentlyModified} />
-                        <Tab label={PageListFilters.RecentlyCreated} />
-                        <Tab label={PageListFilters.All + ' (' + this.state.pages.length + ')'} />
+                        <Tab label={PageListFilters.RecentlyModified} style={tabStyles} />
+                        <Tab label={PageListFilters.RecentlyCreated} style={tabStyles} />
+                        <Tab label={PageListFilters.All + ' (' + this.state.pages.length + ')'} style={tabStyles} />
                     </Tabs>
                         <DisplayWrap 
                             show={this.state.selectedPagesTab === 0}
@@ -169,15 +180,15 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
 
                 <Paper 
                     square 
-                    className="u-height-transition"
+                    className='u-height-transition'
                     style={{ marginBottom: config.styles.spacing.default }}
                 >
                     <Tabs
                         value={this.state.selectedCategoryTab}
-                        indicatorColor="primary"
-                        textColor="primary"
+                        indicatorColor='primary'
+                        textColor='primary'
                         onChange={this.handleCategoryTabChange}
-                        aria-label="disabled tabs example"
+                        aria-label='disabled tabs example'
                     >
                         {this.renderCategoriesTabs()}
                     </Tabs>

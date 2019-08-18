@@ -42,7 +42,7 @@ export default class PageList extends React.Component<IPageListProps, any> {
                 <ListItem
                     button
                     component={Link}
-                    to={config.routes.wiki.page + page.url}
+                    to={config.routes.wiki.page + '/' + page.url}
                     key={page.id}
                     style={{
                         color: config.styles.colours.text.default
@@ -61,9 +61,9 @@ export default class PageList extends React.Component<IPageListProps, any> {
                         secondary={
                             <React.Fragment>
                                 <Typography
-                                    component="span"
-                                    variant="body2"
-                                    color="textPrimary"
+                                    component='span'
+                                    variant='body2'
+                                    color='textPrimary'
                                 >
                                     {WikiApiClient.getReducedPrefaceText(page.preface, this.props.prefaceLength ? this.props.prefaceLength : 300)}
                                 </Typography>
@@ -71,7 +71,7 @@ export default class PageList extends React.Component<IPageListProps, any> {
                         }
                     />
                     <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="edit">
+                        <IconButton edge='end' aria-label='edit'>
                             <EditIcon />
                         </IconButton>
                     </ListItemSecondaryAction>

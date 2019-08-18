@@ -7,6 +7,9 @@ export default createMuiTheme({
         primary: {
             main: config.styles.colours.primary
         },
+        secondary: {
+            main: config.styles.colours.secondary
+        }
     },
     typography: {
         fontFamily: 'Lora',

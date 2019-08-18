@@ -2,7 +2,7 @@ import { WikiApiServer } from './api.wiki.server';
 
 import { IDefaultResponse } from './api.interfaces';
 import { ISource } from './api.search.client';
-import { IPage } from '@interfaces';
+import { IPage, IPageTemplate } from '@interfaces';
 import { DataSources } from '@enums';
 
 class WikiApiClient {
@@ -71,6 +71,31 @@ class WikiApiClient {
         text = text.substr(0,limit-1) + (text.length > limit ? '...' : '');
     
         return text;
+    }
+
+    public getPageTemplate() : IPageTemplate {
+        const PageTemplate: IPageTemplate = {
+            id: '',
+            url: '',
+            title: '',
+            category: '',
+            subcategory: '',
+            images: {
+                main: '',
+                other: [],
+            },
+            details: {},
+            body: '',
+            preface: '',
+            date_created: 0,
+            last_updated: 0
+        }
+
+        return PageTemplate;
+    }
+
+    public getPageIdFromTitle(title: string) {
+        return title.trim().replace(/\s+/g, '_');
     }
 }
 

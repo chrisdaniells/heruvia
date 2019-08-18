@@ -1,14 +1,16 @@
 var path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const PATHS = {
-    app: './src/app.tsx',
+    app: './app.tsx',
     dist: path.join(__dirname, './public')
 };
 
 module.exports = {
     devtool: 'source-map',
-    context: __dirname,
-    entry: ['whatwg-fetch', PATHS.app],
+    context: path.join(__dirname, '/src'),
+    entry: "./app.tsx",
     output: {
         path: PATHS.dist,
         filename: 'bundle.js'
@@ -33,17 +35,26 @@ module.exports = {
     performance: {
         hints: false
     },
+    optimization: {
+        minimizer: [new UglifyJsPlugin()],
+    },
+    plugins: [
+        new HardSourceWebpackPlugin()
+    ],
     externals: {
         //fs: 'fs',
         //path: 'path'
-    },
-    optimization: {
-        minimize: false
     },
     node: {
         __dirname: false,
         __filename: false
     },
+    watch: true,
+    watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000,
+        ignored: /node_modules/
+    },
     mode: "development",
-    target: 'electron-renderer'
-};
+    target: 'electron-renderer',
+}

@@ -1,22 +1,12 @@
 html, body {
     margin: 0;
     padding: 0;
+    background-color: #f1f1f1;
 }
 
 * {
     box-sizing: border-box;
     font-family: Lora;
-}
-
-body {
-    background-color: #f1f1f1;
-}
-
-.u-hover-border {
-    border: 1px solid transparent;
-}
-.u-hover-border:hover {
-    border: 1px solid #790101 !important;
 }
 
 .u-height-transition {
@@ -25,4 +15,53 @@ body {
 
 a:hover {
     color: #790101 !important;
+}
+
+/* GLOBAL OVERRIDES */
+.MuiButton-label {
+    font-family: "Futura LT";
+    font-size: 15px;
+    line-height: 15px;
+    letter-spacing: 1px;
+}
+
+/* QUILL OVERRIDES */
+.quill .ql-toolbar {
+    border: none !important;
+    border-bottom: 1px solid #ccc !important;
+}
+.quill .ql-toolbar button:hover, 
+.quill .ql-toolbar .ql-picker-label:hover,
+.quill .ql-toolbar .ql-picker-item:hover,
+.quill .ql-toolbar button.ql-active,
+.quill .ql-toolbar .ql-picker-label.ql-active,
+.quill .ql-toolbar .ql-picker-options .ql-picker-item.ql-selected
+{
+    color: #790101 !important;
+}
+.quill .ql-toolbar button:hover .ql-stroke,
+.quill .ql-toolbar button:active .ql-stroke,
+.quill .ql-toolbar .ql-picker-label:hover .ql-stroke,
+.quill .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.quill .ql-toolbar button.ql-active .ql-stroke
+{
+    stroke: #790101 !important;
+}
+.quill .ql-container {
+    border: none !important;
+    border-bottom: 1px solid #000 !important;
+}
+.quill .ql-editor {
+    font-size: 16px !important;
+    padding: 7px 0 7px !important;
+    resize: vertical;
+    min-height: 150px;
+}
+
+/* WIKI OVERRIDES */
+.Wiki_CreatePageButton {
+    color: white !important;
+}
+.Wiki_CreatePageButton:hover {
+    color: white !important;
 }

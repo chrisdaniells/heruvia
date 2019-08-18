@@ -4,7 +4,7 @@ import { SwipeableDrawer } from '@material-ui/core';
 
 const styles = makeStyles({
     root: {
-        top: "49px !important",
+        top: '49px !important',
         zIndex: 1099
     },
     paper: {
@@ -28,7 +28,7 @@ export default function SearchDrawer(props: any) {
     return (
         <SwipeableDrawer
             open={open}
-            anchor="top"
+            anchor='top'
             onClose={onClose}
             onOpen={onOpen}
             style={{

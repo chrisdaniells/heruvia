@@ -103,7 +103,7 @@ class WikiApiServer extends ApiServer {
         images.forEach(image => {
             const base = path.basename(image);
             const ext = path.extname(base);
-            const filename = base + "-" + Date.now() + ext;
+            const filename = base + '-' + Date.now() + ext;
             filenames.push(filename);
             fs.copyFileSync(image, config.paths.images + filename);
         });
