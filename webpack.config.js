@@ -1,6 +1,6 @@
-var path = require('path');
+const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const PATHS = {
     app: './app.tsx',
@@ -10,7 +10,7 @@ const PATHS = {
 module.exports = {
     devtool: 'source-map',
     context: path.join(__dirname, '/src'),
-    entry: "./app.tsx",
+    entry: PATHS.app,
     output: {
         path: PATHS.dist,
         filename: 'bundle.js'

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Quill } from 'react-quill';
-const { dialog } = require('electron').remote;
 
 import { SearchApiClient, WikiApiClient } from '@api';
 import { IPage } from '@interfaces';
@@ -166,7 +165,6 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormMainImage() {
-        // NEED TO DETECT IMAGE COLOUR FOR X
         return (
             <div>
                 {this.state.page.images.main.length > 0 &&
@@ -176,13 +174,12 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                             position: "relative"
                         }}
                     >
-                        <IconButton 
+                        <IconButton
+                            className="Wiki_IconOverlayBlend"
                             style={{
                                 position: "absolute",
                                 top: config.styles.spacing.default,
                                 right: config.styles.spacing.default + 10,
-                                mixBlendMode: "darken",
-                                color: "white"
                             }}
                             onClick={() => {
                                 this.setState((state) => {

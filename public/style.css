@@ -65,3 +65,10 @@ a:hover {
 .Wiki_CreatePageButton:hover {
     color: white !important;
 }
+.Wiki_IconOverlayBlend {
+    color: white !important;
+    background: rgba(0,0,0,0.2) !important;
+}
+.Wiki_IconOverlayBlend:hover {
+    background: rgba(0,0,0,0.4) !important;
+}
