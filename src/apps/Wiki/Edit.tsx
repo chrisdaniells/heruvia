@@ -365,6 +365,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         {this.renderFormMainImage()}
                         {this.renderFormTitle()}
                         {this.renderFormCategorySubcategory()}
+                        {this.renderFormDetails()}
                         {this.renderFormQuill('preface')}
                         {this.renderFormQuill('body')}
                         {this.renderFormOtherImages()}
