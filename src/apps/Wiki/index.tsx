@@ -17,7 +17,7 @@ import { PageListFilters } from '@apps/Wiki/enums';
 
 import DisplayWrap from '@components/global/DisplayWrap';
 import PageList from '@components/wiki/PageList';
-import SubcategoryItem from '@components/wiki/SubcategoryItems';
+import SubcategoryItem from '@components/wiki/SubcategoryItem';
 
 interface IWikiAppProps {
     SearchApiClient: SearchApiClient;

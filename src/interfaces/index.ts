@@ -1,2 +1,2 @@
 export { ICategory } from './Category';
-export { IPage, IPageTemplate } from './Page';
+export { IPage, IPageTemplate, IDetailsItem } from './Page';

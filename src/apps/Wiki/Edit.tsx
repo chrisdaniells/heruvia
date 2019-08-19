@@ -7,6 +7,7 @@ import { IPage } from '@interfaces';
 import config from '@config';
 
 import QuillEditor from '@components/global/QuillEditor';
+import DetailsInputList from '@components/wiki/DetailsInputList';
 
 import {
     Button, IconButton,
@@ -72,6 +73,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         this.renderFormMainImage = this.renderFormMainImage.bind(this);
         this.renderFormTitle = this.renderFormTitle.bind(this);
         this.renderFormCategorySubcategory = this.renderFormCategorySubcategory.bind(this);
+        this.renderFormDetails = this.renderFormDetails.bind(this);
         this.renderFormQuill = this.renderFormQuill.bind(this);
         this.renderFormOtherImages = this.renderFormOtherImages.bind(this);
     }
@@ -308,6 +310,22 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 </FormControl>
             </div>
         );
+    }
+
+    renderFormDetails() {
+        if (this.state.page.details.length > 0) {
+            return <DetailsInputList details={this.state.page.details} />
+        } else {
+            return ( <div 
+                        onClick={() => {
+                            this.setState((state) => {
+                                state.page.details.push({label:'',value:''})
+                                return { page: state.page }
+                            });
+                        }}
+                    >Add Detail</div>)
+        }
+        
     }
 
     renderFormQuill(editor: string) {

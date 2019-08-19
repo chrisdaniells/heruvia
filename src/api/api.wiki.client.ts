@@ -84,7 +84,7 @@ class WikiApiClient {
                 main: '',
                 other: [],
             },
-            details: {},
+            details: [],
             body: '',
             preface: '',
             date_created: 0,

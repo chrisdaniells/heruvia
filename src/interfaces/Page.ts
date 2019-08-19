@@ -1,5 +1,6 @@
 import { Categories, SubCategories } from '@enums';
 
+
 export interface IPage {
     id: string;
     url: string;
@@ -10,7 +11,7 @@ export interface IPage {
         main: string;
         other: string[];
     };
-    details: { [key: string] : string }[] | {};
+    details: IDetailsItem[];
     body: string;
     preface: string;
     date_created: number;
@@ -28,9 +29,14 @@ export interface IPageTemplate {
         main: string;
         other: string[];
     };
-    details: object;
+    details: IDetailsItem[];
     body: string;
     preface: string;
     date_created: number;
     last_updated: number;
+}
+
+export interface IDetailsItem {
+    label: string;
+    value: string;
 }
