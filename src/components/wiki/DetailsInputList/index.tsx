@@ -7,9 +7,13 @@ import {
     Button,
     FormControl,
     Grid,
+    IconButton,
     Input,
     InputLabel,
 } from '@material-ui/core';
+import {
+    Cancel as CancelIcon
+} from '@material-ui/icons';
 
 interface IDetailsInputListProps {
     details: IDetailsItem[]
@@ -29,8 +33,12 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
             current: { label: '', value: ''},
         }
 
+        console.log(this.props.details);
+
         this.handleInput = this.handleInput.bind(this);
         this.handleNewInput = this.handleNewInput.bind(this);
+        this.handleNewButtonClick = this.handleNewButtonClick.bind(this);
+        this.handleDeleteDetail = this.handleDeleteDetail.bind(this);
         this.renderDetailsItems = this.renderDetailsItems.bind(this);
     }
 
@@ -47,12 +55,38 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
 
         this.setState({ current });
     }
+
+    handleNewButtonClick() {
+        if (this.state.current.label.length > 0 && this.state.current.value.length > 0) {
+            this.setState(state => {
+                state.details.push(state.current);
+                return { 
+                    details: state.details,
+                    current: { label: '', value: ''}
+                }
+            });
+        }
+    }
+
+    handleDeleteDetail(index: number) {
+        let details = [ this.state.details ];
+        const newDetails = details.splice(index, 1)
+        console.log(newDetails);
+        console.log(index);
+        //this.setState({ details });
+    }
     
     renderDetailsItems() {
         let items: any[] = [];
         this.props.details.forEach((detail: IDetailsItem, index: number) => {
             items.push(
-                <Grid container key={index}>
+                <Grid
+                    container 
+                    key={index}
+                    style={{
+                        marginTop: config.styles.spacing.thin
+                    }}
+                >
                     <Grid item>
                             <Input
                                 name={detail.label}
@@ -72,6 +106,11 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                             onChange={(e) => { this.handleInput('value', e.target.value, index) }}
                         />
                     </Grid>
+                    <Grid item>
+                        <IconButton onClick={() => this.handleDeleteDetail(index) }>
+                                <CancelIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
             );
         });
@@ -86,7 +125,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                 <Grid container>
                     <Grid item>
                         <FormControl>
-                            <InputLabel htmlFor='detail-label'>Detail</InputLabel>
+                            <InputLabel htmlFor='detail-label'>Details</InputLabel>
                             <Input
                                 name='detail-label'
                                 type="text"
@@ -110,8 +149,17 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                             />
                         </FormControl>
                     </Grid>
-                    <Grid item>
-                        <Button>Add New</Button>
+                    <Grid item style={{ position: 'relative'}}>
+                        {this.state.current.label.length > 0 && this.state.current.value.length > 0 &&
+                            <Button
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    width: 100
+                                }}
+                                onClick={this.handleNewButtonClick}
+                            >Add New</Button>
+                        }
                     </Grid>
                 </Grid>
                 {this.renderDetailsItems()}

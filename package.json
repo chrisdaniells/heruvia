@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "webpack",
+    "build": "webpack --progress",
     "watch": "webpack --watch --progress",
     "bs": "webpack && npm start",
     "package": "npm run build && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite"

@@ -49,7 +49,6 @@ module.exports = {
         __dirname: false,
         __filename: false
     },
-    watch: true,
     watchOptions: {
         aggregateTimeout: 300,
         poll: 1000,
