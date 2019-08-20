@@ -1,10 +1,13 @@
 import React from 'react';
 
 import { IDetailsItem } from '@interfaces';
+import config from '@config';
 
 import {
+    FormControl,
     Grid,
-    Input
+    Input,
+    InputLabel,
 } from '@material-ui/core';
 
 interface IDetailsInputListProps {
@@ -12,7 +15,8 @@ interface IDetailsInputListProps {
 }
 
 interface IDetailsInputListState {
-    details: IDetailsItem[]
+    details: IDetailsItem[],
+    current: IDetailsItem;
 }
 
 export default class DetailsEditableList extends React.Component<IDetailsInputListProps, IDetailsInputListState> {
@@ -20,10 +24,12 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
         super(props, state);
 
         this.state = {
-            details: this.props.details
+            details: this.props.details,
+            current: { label: '', value: ''},
         }
 
         this.handleInput = this.handleInput.bind(this);
+        this.handleNewInput = this.handleNewInput.bind(this);
         this.renderDetailsItems = this.renderDetailsItems.bind(this);
     }
 
@@ -33,6 +39,13 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
 
         this.setState({ details });
     }
+
+    handleNewInput(type: string, value: string) {
+        let current = { ...this.state.current };
+        current[type] = value;
+
+        this.setState({ current });
+    }
     
     renderDetailsItems() {
         let items: any[] = [];
@@ -40,19 +53,22 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
             items.push(
                 <Grid container>
                     <Grid item>
-                        <Input
-                            name={detail.label}
-                            type="text"
-                            value={this.state.details[index].label}
-                            onChange={() => { this.handleInput('label', detail.label, index) }}
-                        />
+                            <Input
+                                name={detail.label}
+                                type="text"
+                                value={this.state.current}
+                                onChange={(e) => { this.handleInput('label', e.target.value, index) }}
+                                style={{
+                                    marginRight: config.styles.spacing.default
+                                }}
+                            />
                     </Grid>
                     <Grid item>
                         <Input
                             name={detail.value}
                             type="text"
                             value={this.state.details[index].value}
-                            onChange={() => { this.handleInput('value', detail.value, index) }}
+                            onChange={(e) => { this.handleInput('value', e.target.value, index) }}
                         />
                     </Grid>
                 </Grid>
@@ -60,12 +76,37 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
         });
 
         return items;
-    }
-    
+    }    
 
     render() {
+        console.log(this.state);
         return (
             <div>
+                <Grid container>
+                    <Grid item>
+                        <FormControl>
+                            <InputLabel htmlFor='detail-label'>Detail</InputLabel>
+                            <Input
+                                name='detail-label'
+                                type="text"
+                                value={this.state.current.label}
+                                onChange={(e) => { this.handleNewInput('label', e.target.value) }}
+                                style={{
+                                    marginRight: config.styles.spacing.default
+                                }}
+                                placeholder="Detail"
+                            />
+                        </FormControl>
+                    </Grid>
+                    <Grid item>
+                        <Input
+                            name='detail-value'
+                            type="text"
+                            value={this.state.current.value}
+                            onChange={(e) => { this.handleNewInput('value', e.target.value) }}
+                        />
+                    </Grid>
+                </Grid>
                 {this.renderDetailsItems()}
             </div>
         );
