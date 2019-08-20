@@ -313,19 +313,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormDetails() {
-        if (this.state.page.details.length > 0) {
-            return <DetailsInputList details={this.state.page.details} />
-        } else {
-            return ( <div 
-                        onClick={() => {
-                            this.setState((state) => {
-                                state.page.details.push({label:'',value:''})
-                                return { page: state.page }
-                            });
-                        }}
-                    >Add Detail</div>)
-        }
-        
+        return <DetailsInputList details={this.state.page.details} />
     }
 
     renderFormQuill(editor: string) {

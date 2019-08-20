@@ -4,6 +4,7 @@ import { IDetailsItem } from '@interfaces';
 import config from '@config';
 
 import {
+    Button,
     FormControl,
     Grid,
     Input,
@@ -51,12 +52,12 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
         let items: any[] = [];
         this.props.details.forEach((detail: IDetailsItem, index: number) => {
             items.push(
-                <Grid container>
+                <Grid container key={index}>
                     <Grid item>
                             <Input
                                 name={detail.label}
                                 type="text"
-                                value={this.state.current}
+                                value={this.state.details[index].label}
                                 onChange={(e) => { this.handleInput('label', e.target.value, index) }}
                                 style={{
                                     marginRight: config.styles.spacing.default
@@ -81,7 +82,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
     render() {
         console.log(this.state);
         return (
-            <div>
+            <div style={{ marginBottom: config.styles.spacing.default }}>
                 <Grid container>
                     <Grid item>
                         <FormControl>
@@ -91,20 +92,26 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                                 type="text"
                                 value={this.state.current.label}
                                 onChange={(e) => { this.handleNewInput('label', e.target.value) }}
-                                style={{
-                                    marginRight: config.styles.spacing.default
-                                }}
+                                style={{ marginRight: config.styles.spacing.default }}
                                 placeholder="Detail"
                             />
                         </FormControl>
                     </Grid>
                     <Grid item>
-                        <Input
-                            name='detail-value'
-                            type="text"
-                            value={this.state.current.value}
-                            onChange={(e) => { this.handleNewInput('value', e.target.value) }}
-                        />
+                        <FormControl>
+                            <InputLabel htmlFor='detail-value'></InputLabel>
+                            <Input
+                                name='detail-value'
+                                type="text"
+                                value={this.state.current.value}
+                                onChange={(e) => { this.handleNewInput('value', e.target.value) }}
+                                style={{ marginRight: config.styles.spacing.default }}
+                                placeholder={this.state.current.label.length > 0 ? 'Enter Value...' : ''}
+                            />
+                        </FormControl>
+                    </Grid>
+                    <Grid item>
+                        <Button>Add New</Button>
                     </Grid>
                 </Grid>
                 {this.renderDetailsItems()}
