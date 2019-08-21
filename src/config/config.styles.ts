@@ -4,7 +4,8 @@ const colours = {
     line: '#d2d2d2',
     background: '#f1f1f1',
     text: {
-        default: '#000000'
+        default: '#000000',
+        faint: '#848484',
     },
 };
 

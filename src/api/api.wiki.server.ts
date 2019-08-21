@@ -49,7 +49,7 @@ class WikiApiServer extends ApiServer {
         if (!id) return this.generateDefaultResponse(false);
 
         const files = this.readDirectory(config.paths.wikipages);
-        const file = files.find(file => { return this.isFileById(id, file.name) });
+        const file = files.find(file => { return id === file.id });
         const status = file !== undefined;
         
         return this.generateDefaultResponse(status, status ? file : {});

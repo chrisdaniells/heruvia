@@ -9,15 +9,51 @@ interface IQuillEditorProps {
     id: string;
     formStyles?: { [key: string] : string };
     isFocused: boolean;
+    value: string;
     onChange(id: string, content: string): any;
     onFocus(id: string): any;
     onBlur(): any;
+    sanitize?: any;
 }
 
 export default class QuillEditor extends React.Component<IQuillEditorProps, any> {
 
     constructor(props: IQuillEditorProps, state: any) {
         super(props);
+
+        this.sanitizeQuill = this.sanitizeQuill.bind(this);
+    }
+
+    componentDidMount() {
+        this.sanitizeQuill();
+    }
+
+    sanitizeQuill() {
+        let sanitize = null;
+        if (this.props.sanitize !== undefined) {
+            sanitize = this.props.sanitize;
+        }
+        const QuillLink = class QuillLink extends Quill.import('formats/link') {
+            static create(value) {
+                let node = super.create(value);
+                value = this.sanitize(value);
+                node.setAttribute('href', value);
+                if(value.startsWith('#')) {
+                    node.removeAttribute('target');
+                }
+                return node;
+            }
+            
+            static sanitize(url: string) {
+                if (sanitize !== null) {
+                    console.log('woo');
+                    url = sanitize(url);
+                }
+                return url;
+            }
+        };
+
+        Quill.register(QuillLink);
     }
 
     render() {
@@ -45,6 +81,7 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                     >{this.props.id}</InputLabel>
                     <BodyEditor
                         id={this.props.id}
+                        value={this.props.value}
                         onChange={(content) => { this.props.onChange(this.props.id, content) }}
                         onFocus={() => { this.props.onFocus(this.props.id) }}
                         onBlur={() => { this.props.onBlur() }}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Quill } from 'react-quill';
 
 import { SearchApiClient, WikiApiClient } from '@api';
-import { IPage } from '@interfaces';
+import { IPage, IDetailsItem } from '@interfaces';
 import config from '@config';
 
 import QuillEditor from '@components/global/QuillEditor';
@@ -36,6 +36,11 @@ interface IEditProps {
 interface IEditState {
     page: IPage | null;
     quillFocus: string | null;
+    alert: {
+        open: boolean;
+        title?: string;
+        message?: string;
+    }
 }
 
 const inputStyle = {
@@ -46,26 +51,31 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     constructor(props: IEditProps, state: IEditState) {
         super(props, state);
 
-        let page = null;
+        let page = this.props.WikiApiClient.getPageTemplate();
+        let alert = { open: false, title: '', message: '' };
+
         if (this.props.match.params.id !== undefined) {
             const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
             if (pageResponse.status) {
                 page = pageResponse.data;
             } else {
-                // Create Page?
+                alert = {
+                    open: true,
+                    title: 'Page Not Found',
+                    message: 'The page you are looking for has not been found.',
+                }
             }
-        } else {
-            page = this.props.WikiApiClient.getPageTemplate();
         }
-        
+
         this.state = {
             page,
             quillFocus: null,
+            alert,
         }
 
-        this.sanitizeQuill = this.sanitizeQuill.bind(this);
         this.handleQuillFocus = this.handleQuillFocus.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
+        this.handleDetailsFormChange = this.handleDetailsFormChange.bind(this);
         this.handleQuillFormChange = this.handleQuillFormChange.bind(this);
         this.handleImageUpload = this.handleImageUpload.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
@@ -86,30 +96,6 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         document.removeEventListener('keydown', this.handleKeyDown);
     }
 
-    sanitizeQuill() {
-        const QuillLink = class QuillLink extends Quill.import('formats/link') {
-            static create(value: any) {
-                let node = super.create(value);
-                value = this.sanitize(value);
-                node.setAttribute('href', value);
-                if(value.startsWith('#')) {
-                    node.removeAttribute('target');
-                  }
-                return node;
-            }
-            static sanitize(url: string) {
-                if (url[0] == '#') { 
-                    url = url.replace('#', '');
-                    url = url.replace('/view/', '');
-                    url = '#/view/' + this.props.WikiApiClient.getPageIdFromTitle(url);
-                };
-                return url;
-            }
-        };
-
-        Quill.register(QuillLink);
-    }
-
     handleQuillFocus(editor: string | null = null) {
         this.setState((state: any) => ({
             quillFocus: state.quillFocus !== editor ? editor : null
@@ -123,11 +109,27 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         return false;
     }
 
+    
+    handleErrorClose() {
+        let alert = { ...this.state.alert };
+        alert = {
+            open: false,
+            title: '',
+            message: '',
+        };
+        this.setState({ alert });
+    }
+
     handleFormChange(e: any) {
-        console.log(e.target);
         const { name, value } = e.target;
         let page = { ...this.state.page };
         page[name] = value;
+        this.setState({ page });
+    }
+
+    handleDetailsFormChange(details: IDetailsItem[]) {
+        let page = { ...this.state.page };
+        page.details = details;
         this.setState({ page });
     }
 
@@ -144,26 +146,23 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     handleImageUpload(e: any) {
         const { files, name } = e.target;
         let page = { ...this.state.page };
-
-        console.log(files);
         
         switch(name) {
             case "main-image":
                 page.images.main = files[0].path;
                 break;
             case "other-images":
-                page.images.other = Object.keys(files).map((key: number | string) => { return files[key].path });
+                const newImages = Object.keys(files).map((key: number | string) => { return files[key].path });
+                page.images.other = [ ...page.images.other, ...newImages ];
                 break;
         }
         this.setState({ page });
     }
 
     handleDelete() {
-
     }
 
     handleSave() {
-
     }
 
     renderFormMainImage() {
@@ -234,33 +233,84 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormOtherImages() {
+        let otherImages: any[] = [];
+        this.state.page.images.other.forEach((image, index) => {
+            otherImages.push(
+                    <div
+                        key={index}
+                        style={{
+                            position: 'relative',
+                            display: 'inline-block',
+                            verticalAlign: 'top',
+                            marginRight: config.styles.spacing.thin,
+                            marginBottom: config.styles.spacing.thin,
+                        }}
+                        >
+                        <img
+                            src={image} 
+                            style={{
+                                width: 'auto',
+                                height: 150,
+                            }} 
+                        />
+                        <IconButton 
+                            onClick={() => {
+                                let page = { ...this.state.page };
+                                page.images.other.splice(index, 1);
+                                this.setState({ page });
+                            }}
+                            className="Wiki_IconOverlayBlend"
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                right: 0,
+                                top: '44%',
+                                bottom: 0,
+                                margin: '0 auto',
+                                display: 'block',
+                                transform: 'translateY(-50%)',
+                                height: 48,
+                                width: 48,
+                            }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </div>
+            );
+        });
+
         return(
-            <Button 
-                variant='outlined' 
-                component='label'
-                style={{
-                    width: '100%',
-                    borderRadius: 0,
-                    border: 'none',
-                    height: 50,
-                    color: '#000000',
-                    fontSize: 15,
-                    marginBottom: config.styles.spacing.thin
-                }}
-            >
-                <ImageIcon 
-                    style={{ 
-                        marginRight: config.styles.spacing.thin 
-                    }}/>{this.state.page.images.main.length ? 'Change' : 'Upload' } Additional Images
-                <input
-                    accept='image/*'
-                    multiple
-                    name='other-images'
-                    type='file'
-                    style={{ display: 'none' }}
-                    onChange={(e) => { this.handleImageUpload(e) }}
-                />
-            </Button>
+            <div>
+                <Button 
+                    variant='outlined' 
+                    component='label'
+                    style={{
+                        width: '100%',
+                        borderRadius: 0,
+                        border: 'none',
+                        height: 50,
+                        color: '#000000',
+                        fontSize: 15,
+                        marginBottom: config.styles.spacing.thin
+                    }}
+                >
+                    <ImageIcon 
+                        style={{ 
+                            marginRight: config.styles.spacing.thin 
+                        }}/>Add Additional Images
+                    <input
+                        accept='image/*'
+                        multiple
+                        name='other-images'
+                        type='file'
+                        style={{ display: 'none' }}
+                        onChange={(e) => { this.handleImageUpload(e) }}
+                    />
+                </Button>
+                <div>
+                    {otherImages}
+                </div>
+            </div>
         );
     }
 
@@ -278,6 +328,30 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormCategorySubcategory() {
+        let categoryItems: any[] = [];
+        let subcategoryItems: any[] = [];
+        for (let category in config.categories) {
+            if (!config.categories.hasOwnProperty(category)) continue;
+            categoryItems.push(
+                <MenuItem
+                    key={category}
+                    value={category}
+                    style={{ textTransform: 'capitalize' }}
+                >{category}</MenuItem>
+            );
+        }
+        if (this.state.page.category.length > 0) {
+            config.categories[this.state.page.category].forEach(subcategory => {
+                subcategoryItems.push(
+                    <MenuItem 
+                        key={subcategory}
+                        value={subcategory}
+                        style={{ textTransform: 'capitalize' }}
+                    >{subcategory}
+                    </MenuItem>);
+            });
+        }
+
         return  (
             <div>
                 <FormControl fullWidth style={inputStyle}>
@@ -288,10 +362,15 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         inputProps={{
                             name: 'category'
                         }}
+                        style={{ textTransform: 'capitalize' }}
                     >
-                        <MenuItem value=''>Select Category</MenuItem>
-                        <MenuItem value='juan'>Category 1</MenuItem>
-                        <MenuItem value='carlos'>Category 2</MenuItem>
+                        <MenuItem 
+                            value=''
+                            style={{
+                                color: config.styles.colours.text.faint
+                            }}
+                        >Select Category</MenuItem>
+                        {categoryItems}
                     </Select>
                 </FormControl>
                 <FormControl fullWidth style={inputStyle}>
@@ -302,10 +381,16 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         inputProps={{
                             name: 'subcategory'
                         }}
+                        style={{ textTransform: 'capitalize' }}
+                        disabled={this.state.page.category.length === 0}
                     >
-                        <MenuItem value=''>Select Subcategory</MenuItem>
-                        <MenuItem value='juann'>Subcategory 1</MenuItem>
-                        <MenuItem value='carloss'>Subcategory 2</MenuItem>
+                        <MenuItem 
+                            value=''
+                            style={{
+                                color: config.styles.colours.text.faint
+                            }}
+                        >Select Subcategory</MenuItem>
+                        {subcategoryItems}
                     </Select>
                 </FormControl>
             </div>
@@ -313,7 +398,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormDetails() {
-        return <DetailsInputList details={this.state.page.details} />
+        return <DetailsInputList 
+                    details={this.state.page.details}
+                    onAdd={this.handleDetailsFormChange}
+                />
     }
 
     renderFormQuill(editor: string) {
@@ -321,8 +409,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         return (
             <QuillEditor
                 id={editor}
+                value={this.state.page[editor]}
                 formStyles={inputStyle}
                 isFocused={isFocused}
+                sanitize={this.props.WikiApiClient.sanitizeQuillLink}
                 onChange={this.handleQuillFormChange}
                 onFocus={this.handleQuillFocus}
                 onBlur={this.handleQuillFocus}
@@ -358,8 +448,8 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         {this.renderFormQuill('body')}
                         {this.renderFormOtherImages()}
                     </CardContent>
-                    <CardActions>
-                        { this.state.page.id !== null &&
+                    <CardActions style={{ marginBottom: config.styles.spacing.default }}>
+                        { this.state.page.id.length > 0 &&
                             <IconButton onClick={this.handleDelete}>
                                 <DeleteIcon />
                             </IconButton>

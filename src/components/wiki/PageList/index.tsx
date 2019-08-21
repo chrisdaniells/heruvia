@@ -71,7 +71,12 @@ export default class PageList extends React.Component<IPageListProps, any> {
                         }
                     />
                     <ListItemSecondaryAction>
-                        <IconButton edge='end' aria-label='edit'>
+                        <IconButton
+                            component={Link}
+                            to={config.routes.wiki.edit + '/' + page.id}
+                            edge='end' 
+                            aria-label='edit'
+                        >                        
                             <EditIcon />
                         </IconButton>
                     </ListItemSecondaryAction>

@@ -128,7 +128,6 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
     }
 
     render() {
-        console.log(this.props);
         return (
             <div style={{ ...config.styles.container, marginTop: 100, }}>
                 <div style={{ textAlign: 'right', marginBottom: config.styles.spacing.default }}>

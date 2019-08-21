@@ -2,8 +2,9 @@ import { WikiApiServer } from './api.wiki.server';
 
 import { IDefaultResponse } from './api.interfaces';
 import { ISource } from './api.search.client';
-import { IPage, IPageTemplate } from '@interfaces';
+import { IPage } from '@interfaces';
 import { DataSources } from '@enums';
+import config from '@config';
 
 class WikiApiClient {
     private WikiApiServer: WikiApiServer;
@@ -73,8 +74,8 @@ class WikiApiClient {
         return text;
     }
 
-    public getPageTemplate() : IPageTemplate {
-        const PageTemplate: IPageTemplate = {
+    public getPageTemplate() : IPage {
+        const PageTemplate: IPage = {
             id: '',
             url: '',
             title: '',
@@ -96,6 +97,15 @@ class WikiApiClient {
 
     public getPageIdFromTitle(title: string) {
         return title.trim().replace(/\s+/g, '_');
+    }
+
+    public sanitizeQuillLink(url: string) {
+        if (url[0] == '#') { 
+            url = url.replace('#', '');
+            url = url.replace(config.routes.wiki.page + '/', '');
+            url = '#' + config.routes.wiki.page + '/' + url.trim().replace(/\s+/g, '_');
+        };
+        return url;
     }
 }
 

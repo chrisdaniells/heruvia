@@ -16,7 +16,8 @@ import {
 } from '@material-ui/icons';
 
 interface IDetailsInputListProps {
-    details: IDetailsItem[]
+    details: IDetailsItem[],
+    onAdd(state: IDetailsItem[]): void,
 }
 
 interface IDetailsInputListState {
@@ -25,6 +26,9 @@ interface IDetailsInputListState {
 }
 
 export default class DetailsEditableList extends React.Component<IDetailsInputListProps, IDetailsInputListState> {
+    private draggedItem: number;
+    private dropPosition: number;
+    
     constructor(props: IDetailsInputListProps, state: IDetailsInputListState) {
         super(props, state);
 
@@ -33,20 +37,43 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
             current: { label: '', value: ''},
         }
 
-        console.log(this.props.details);
-
+        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleInput = this.handleInput.bind(this);
         this.handleNewInput = this.handleNewInput.bind(this);
         this.handleNewButtonClick = this.handleNewButtonClick.bind(this);
         this.handleDeleteDetail = this.handleDeleteDetail.bind(this);
+        this.handleDetailDrag = this.handleDetailDrag.bind(this);
+        this.handleDetailDragOver = this.handleDetailDragOver.bind(this);
+        this.handleDetailDragEnd = this.handleDetailDragEnd.bind(this);
         this.renderDetailsItems = this.renderDetailsItems.bind(this);
+    }
+
+    componentDidMount() {
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleKeyDown);
+    }
+
+    handleKeyDown(e: any) {
+        if (e.keyCode === 13 && document.activeElement.id === 'detail-value') {
+            e.preventDefault();
+            this.handleNewButtonClick();
+            return false;
+        }
+        return true;
     }
 
     handleInput(type: string, value: string | number, index: number): void {
         let details = [ ...this.state.details ];
         details[index as number][type] = value;
 
-        this.setState({ details });
+        this.setState({ 
+            details
+        }, () => {
+            this.props.onAdd(this.state.details);
+        });
     }
 
     handleNewInput(type: string, value: string) {
@@ -64,28 +91,65 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                     details: state.details,
                     current: { label: '', value: ''}
                 }
+            }, () => {
+                this.props.onAdd(this.state.details);
+                document.getElementById('detail-label').focus();
             });
         }
     }
 
     handleDeleteDetail(index: number) {
-        let details = [ this.state.details ];
-        const newDetails = details.splice(index, 1)
-        console.log(newDetails);
-        console.log(index);
-        //this.setState({ details });
+        let details = [ ...this.state.details ];
+        details.splice(index, 1);
+        
+        this.setState({ 
+            details 
+        }, () => {
+            this.props.onAdd(this.state.details);
+            document.getElementById('detail-label').focus();
+        });
+    }
+
+    handleDetailDrag(e: any, index: number) {
+        e.dataTransfer.setData("index", index);
+        e.dataTransfer.effectAllowed = "move";
+
+        this.draggedItem = index;
+    }
+
+    handleDetailDragOver(e: any, index: number) {
+        e.preventDefault();
+        if (this.draggedItem === index) return;
+
+        this.dropPosition = index;
+    }
+
+    handleDetailDragEnd() {
+        let details = this.state.details.filter((detail, index) => {
+            return index !== this.draggedItem;
+        });
+        
+        details.splice(this.dropPosition, 0, this.state.details[this.draggedItem]);
+
+        this.setState({ 
+            details 
+        }, () => {
+            this.props.onAdd(this.state.details);
+        });
     }
     
     renderDetailsItems() {
         let items: any[] = [];
-        this.props.details.forEach((detail: IDetailsItem, index: number) => {
+        this.state.details.forEach((detail: IDetailsItem, index: number) => {
             items.push(
-                <Grid
-                    container 
+                <Grid 
+                    container
                     key={index}
-                    style={{
-                        marginTop: config.styles.spacing.thin
-                    }}
+                    style={{ marginTop: 5 }}
+                    onDragStart={(e) => this.handleDetailDrag(e, index)} 
+                    onDragOver={(e) => this.handleDetailDragOver(e, index)}
+                    onDrop={this.handleDetailDragEnd}
+                    draggable
                 >
                     <Grid item>
                             <Input
@@ -107,7 +171,10 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                         />
                     </Grid>
                     <Grid item>
-                        <IconButton onClick={() => this.handleDeleteDetail(index) }>
+                        <IconButton 
+                            onClick={() => this.handleDeleteDetail(index)}
+                            size='small'
+                        >
                                 <CancelIcon />
                         </IconButton>
                     </Grid>
@@ -119,15 +186,15 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
     }    
 
     render() {
-        console.log(this.state);
         return (
             <div style={{ marginBottom: config.styles.spacing.default }}>
-                <Grid container>
+                <Grid container style={{ marginBottom: config.styles.spacing.thin }}>
                     <Grid item>
                         <FormControl>
                             <InputLabel htmlFor='detail-label'>Details</InputLabel>
                             <Input
                                 name='detail-label'
+                                id='detail-label'
                                 type="text"
                                 value={this.state.current.label}
                                 onChange={(e) => { this.handleNewInput('label', e.target.value) }}
@@ -141,6 +208,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                             <InputLabel htmlFor='detail-value'></InputLabel>
                             <Input
                                 name='detail-value'
+                                id='detail-value'
                                 type="text"
                                 value={this.state.current.value}
                                 onChange={(e) => { this.handleNewInput('value', e.target.value) }}
@@ -158,7 +226,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                                     width: 100
                                 }}
                                 onClick={this.handleNewButtonClick}
-                            >Add New</Button>
+                            >Add</Button>
                         }
                     </Grid>
                 </Grid>

@@ -29,6 +29,8 @@ abstract class ApiServer {
     }
 
     public isFileById(id: string, filename: string) {
+        console.log(id);
+        console.log(filename);
         return path.basename(filename, '.json').toLowerCase() === id.toLowerCase();
     }
 
