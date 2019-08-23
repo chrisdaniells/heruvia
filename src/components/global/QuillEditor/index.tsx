@@ -10,6 +10,7 @@ interface IQuillEditorProps {
     formStyles?: { [key: string] : string };
     isFocused: boolean;
     value: string;
+    formats: string[];
     onChange(id: string, content: string): any;
     onFocus(id: string): any;
     onBlur(): any;
@@ -46,7 +47,6 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
             
             static sanitize(url: string) {
                 if (sanitize !== null) {
-                    console.log('woo');
                     url = sanitize(url);
                 }
                 return url;
@@ -85,14 +85,12 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                         onChange={(content) => { this.props.onChange(this.props.id, content) }}
                         onFocus={() => { this.props.onFocus(this.props.id) }}
                         onBlur={() => { this.props.onBlur() }}
+                        formats={this.props.formats}
                         modules={{
                             clipboard: {
                                 matchVisual: false,
                             }
                         }}
-                        formats={[
-                            'bold', 'italic', 'underline', 'strike', 'blockquote', 'indent', 'link', 'image'
-                        ]}
                     />
                 </FormControl>
                 <div style={{ clear: 'both' }} />

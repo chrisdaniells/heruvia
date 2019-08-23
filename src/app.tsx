@@ -14,6 +14,7 @@ import LanguagesApp from '@apps/Languages';
 import NotesApp from '@apps/Notes';
 import TimelineApp from '@apps/Timeline';
 
+import ScrollToTop from '@components/global/ScrollToTop';
 import Header from '@components/global/Header';
 
 const wikiApiClient = new WikiApiClient();
@@ -27,32 +28,37 @@ const WikiAppProps = {
 ReactDOM.render((
     <ThemeProvider theme={theme}>
         <Router>
-            <Header 
-                WikiApiClient={wikiApiClient}
-                SearchApiClient={searchApiClient}
-            />
-            <Switch>
-                <Route path='/notes' component={NotesApp} />
-                <Route path='/timeline' component={TimelineApp} />
-                <Route path='/languages' component={LanguagesApp} />
+            <ScrollToTop>
+                <Header 
+                    WikiApiClient={wikiApiClient}
+                    SearchApiClient={searchApiClient}
+                />
+                <Switch>
+                    <Route path='/notes' component={NotesApp} />
+                    <Route path='/timeline' component={TimelineApp} />
+                    <Route path='/languages' component={LanguagesApp} />
 
-                <Route path='/wiki/list/:attribute/:value' component={WikiApp} />
-                <Route 
-                    path={config.routes.wiki.edit + '/:id?'}
-                    render={(props) => (<WikiEdit {...props} {...WikiAppProps} />)} 
-                />
-                <Route 
-                    exact 
-                    path={config.routes.wiki.root}
-                    render={(props) => (<WikiApp {...props} {...WikiAppProps} />)} 
-                />
-                <Route
-                    exact
-                    path='/'
-                    render={(props) => (<WikiApp  {...props} {...WikiAppProps} />)}
-                />
-                <Route render={(props) => (<WikiApp {...props} {...WikiAppProps} />)} />
-            </Switch>
+                    <Route
+                        path='/wiki/list/:attribute/:value'
+                        render={(props) => (<WikiApp {...props} {...WikiAppProps} />)}
+                    />
+                    <Route 
+                        path={config.routes.wiki.edit + '/:id?'}
+                        render={(props) => (<WikiEdit {...props} {...WikiAppProps} />)} 
+                    />
+                    <Route 
+                        exact 
+                        path={config.routes.wiki.root}
+                        render={(props) => (<WikiApp {...props} {...WikiAppProps} />)} 
+                    />
+                    <Route
+                        exact
+                        path='/'
+                        render={(props) => (<WikiApp  {...props} {...WikiAppProps} />)}
+                    />
+                    <Route render={(props) => (<WikiApp {...props} {...WikiAppProps} />)} />
+                </Switch>
+            </ScrollToTop>
         </Router>
     </ThemeProvider>
 ), document.getElementById('app'));

@@ -15,8 +15,8 @@ export interface IPage {
     details: IDetailsItem[];
     body: string;
     preface: string;
-    date_created: number;
-    last_updated: number;
+    date_created: string;
+    last_updated: string;
     [key: string]: any;
 }
 

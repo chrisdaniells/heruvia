@@ -17,7 +17,7 @@ class WikiApiClient {
         this.WikiApiServer = new WikiApiServer();
 
         this.cacheTimeStamp = 0;
-        this.cacheTime = 10000
+        this.cacheTime = 5000
     }
 
     public getAllPages() : IDefaultResponse {
@@ -40,8 +40,8 @@ class WikiApiClient {
         return this.WikiApiServer.deletePageById(id);
     }
 
-    public updatePageById(id: string, data: IPage) : IDefaultResponse {
-        return this.WikiApiServer.updatePageById(id, data);
+    public updatePageById(data: IPage, newId: boolean) : IDefaultResponse {
+        return this.WikiApiServer.updatePageById(data, newId);
     }
 
     public uploadImages(images: string[]) : IDefaultResponse {
@@ -74,8 +74,8 @@ class WikiApiClient {
         return text;
     }
 
-    public getPageTemplate() : IPage {
-        const PageTemplate: IPage = {
+    public getPageTemplate(template?: string) : IPage {
+        let PageTemplate: IPage = {
             id: '',
             url: '',
             title: '',
@@ -88,15 +88,19 @@ class WikiApiClient {
             details: [],
             body: '',
             preface: '',
-            date_created: 0,
-            last_updated: 0
+            date_created: '',
+            last_updated: '',
+        }
+
+        if (template) {
+            
         }
 
         return PageTemplate;
     }
 
     public getPageIdFromTitle(title: string) {
-        return title.trim().replace(/\s+/g, '_');
+        return this.WikiApiServer.getPageIdFromTitle(title);
     }
 
     public sanitizeQuillLink(url: string) {
@@ -106,6 +110,24 @@ class WikiApiClient {
             url = '#' + config.routes.wiki.page + '/' + url.trim().replace(/\s+/g, '_');
         };
         return url;
+    }
+
+    public validatePage(page: IPage): IDefaultResponse {
+        let errors: string[] = [];
+
+        if (page.title.length === 0) {
+            errors.push('Please enter a page title.');
+        } else {
+            const existCheck = this.getPageById(this.getPageIdFromTitle(page.title));
+            if (existCheck.status && page.id !== existCheck.data.id) {
+                errors.push('A page with this title already exists.');
+            } 
+        } 
+        if (page.category.length === 0) errors.push('Please select a page category.');
+        if (page.subcategory.length === 0) errors.push('Please select a page subcategory.');
+        if (page.body.length === 0) errors.push('Please enter a page body');
+
+        return this.WikiApiServer.generateDefaultResponse(errors.length == 0, errors);
     }
 }
 

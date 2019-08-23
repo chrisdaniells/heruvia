@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Quill } from 'react-quill';
 
 import { SearchApiClient, WikiApiClient } from '@api';
 import { IPage, IDetailsItem } from '@interfaces';
@@ -8,14 +7,13 @@ import config from '@config';
 
 import QuillEditor from '@components/global/QuillEditor';
 import DetailsInputList from '@components/wiki/DetailsInputList';
+import Alert, { IAlertProps } from '@components/global/Alert';
 
 import {
     Button, IconButton,
     Card, CardHeader, CardActions, CardContent,
-    FormControl,
-    Input, InputLabel,
-    MenuItem,
-    Select,
+    FormControl, Input, InputLabel,
+    MenuItem, Select,
 } from '@material-ui/core';
 import {
     ArrowBack as CancelIcon,
@@ -40,6 +38,8 @@ interface IEditState {
         open: boolean;
         title?: string;
         message?: string;
+        close: any | false;
+        confirm: any | false;
     }
 }
 
@@ -51,19 +51,30 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     constructor(props: IEditProps, state: IEditState) {
         super(props, state);
 
-        let page = this.props.WikiApiClient.getPageTemplate();
-        let alert = { open: false, title: '', message: '' };
+        let page: IPage = this.props.WikiApiClient.getPageTemplate();
+        let alert: IAlertProps = { open: false, title: '', message: '', close: false, confirm: false };
 
         if (this.props.match.params.id !== undefined) {
             const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
             if (pageResponse.status) {
                 page = pageResponse.data;
+                if (!config.categories.hasOwnProperty(page.category)) {
+                    page.category = '',
+                    page.subcategory ='';
+                } else if (!config.categories[page.category].includes(page.subcategory)) {
+                    page.subcategory = '';
+                }
             } else {
                 alert = {
                     open: true,
                     title: 'Page Not Found',
                     message: 'The page you are looking for has not been found.',
-                }
+                    close: {
+                        onClose: this.resetAlert,
+                        label: "OK",
+                    },
+                    confirm: false,
+                };
             }
         }
 
@@ -71,9 +82,11 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
             page,
             quillFocus: null,
             alert,
-        }
+        };
 
+        this.resetAlert = this.resetAlert.bind(this);
         this.handleQuillFocus = this.handleQuillFocus.bind(this);
+        this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.handleDetailsFormChange = this.handleDetailsFormChange.bind(this);
         this.handleQuillFormChange = this.handleQuillFormChange.bind(this);
@@ -96,10 +109,27 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         document.removeEventListener('keydown', this.handleKeyDown);
     }
 
+    resetAlert(): void {
+        this.setState (state => ({
+            alert: { ...state.alert, open: false }
+        }),() => {
+            // Otherwise text disappears before dialog closes
+            setTimeout(() => {
+                this.setState(state => ({
+                    alert: {
+                        ...state.alert,
+                        title: '',
+                        message: '',
+                        close: false,
+                        confirm: false,
+                    }
+                }));
+            }, 100);
+        });
+    }
+
     handleQuillFocus(editor: string | null = null) {
-        this.setState((state: any) => ({
-            quillFocus: state.quillFocus !== editor ? editor : null
-        }));
+        this.setState((state: any) => ({ quillFocus: state.quillFocus !== editor ? editor : null }));
     }
 
     handleKeyDown(e: any) {
@@ -109,15 +139,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         return false;
     }
 
-    
-    handleErrorClose() {
-        let alert = { ...this.state.alert };
-        alert = {
-            open: false,
-            title: '',
-            message: '',
-        };
-        this.setState({ alert });
+    handleDeleteConfirm() {
+        this.props.WikiApiClient.deletePageById(this.state.page.id);
+        this.props.history.push({ pathname: config.routes.wiki.root });
+        location.reload(true);
     }
 
     handleFormChange(e: any) {
@@ -146,23 +171,57 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     handleImageUpload(e: any) {
         const { files, name } = e.target;
         let page = { ...this.state.page };
+
+        const filepaths = Object.keys(files).map((key: number | string) => { return files[key].path });
+        const uploads = this.props.WikiApiClient.uploadImages(filepaths);
+
+        if (!uploads.status) return;
         
         switch(name) {
             case "main-image":
-                page.images.main = files[0].path;
+                page.images.main = uploads.data[0];
                 break;
             case "other-images":
-                const newImages = Object.keys(files).map((key: number | string) => { return files[key].path });
-                page.images.other = [ ...page.images.other, ...newImages ];
+                page.images.other = [ ...page.images.other, ...uploads.data ];
                 break;
         }
         this.setState({ page });
     }
 
     handleDelete() {
+        this.setState({
+            alert: {
+                open: true,
+                title: 'Delete Page',
+                message: 'Are you sure you want to delete this page?',
+                close: { onClose: this.resetAlert, label: "Cancel" },
+                confirm: { onConfirm: this.handleDeleteConfirm, label: "Yes" }
+            }
+        });
     }
 
     handleSave() {
+        const validation = this.props.WikiApiClient.validatePage(this.state.page);
+
+        if (!validation.status) {
+            const messages = validation.data.map(message => {
+                return <p>{message}</p>;
+            });
+            this.setState({
+                alert: {
+                    open: true,
+                    title: 'Validation Errors',
+                    message: messages,
+                    close: {
+                        onClose: this.resetAlert,
+                        label: 'OK',
+                    },
+                    confirm: false,
+                }
+            });
+        } else {
+            this.props.WikiApiClient.updatePageById(this.state.page, this.state.page.id.length === 0);
+        }
     }
 
     renderFormMainImage() {
@@ -192,7 +251,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                             <ClearIcon />
                         </IconButton>
                         <img 
-                            src={this.state.page.images.main}
+                            src={config.paths.images + '/' + this.state.page.images.main}
                             style={{
                                 height: "auto",
                                 width: "auto",
@@ -247,11 +306,8 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         }}
                         >
                         <img
-                            src={image} 
-                            style={{
-                                width: 'auto',
-                                height: 150,
-                            }} 
+                            src={config.paths.images + '/' + image} 
+                            style={{ width: 'auto', height: 150 }} 
                         />
                         <IconButton 
                             onClick={() => {
@@ -294,10 +350,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         marginBottom: config.styles.spacing.thin
                     }}
                 >
-                    <ImageIcon 
-                        style={{ 
-                            marginRight: config.styles.spacing.thin 
-                        }}/>Add Additional Images
+                    <ImageIcon style={{ marginRight: config.styles.spacing.thin }}/>Add Additional Images
                     <input
                         accept='image/*'
                         multiple
@@ -307,9 +360,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         onChange={(e) => { this.handleImageUpload(e) }}
                     />
                 </Button>
-                <div>
-                    {otherImages}
-                </div>
+                <div>{otherImages}</div>
             </div>
         );
     }
@@ -359,16 +410,12 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                     <Select
                         value={this.state.page.category}
                         onChange={(e) => { this.handleFormChange(e) }}
-                        inputProps={{
-                            name: 'category'
-                        }}
+                        inputProps={{ name: 'category' }}
                         style={{ textTransform: 'capitalize' }}
                     >
                         <MenuItem 
                             value=''
-                            style={{
-                                color: config.styles.colours.text.faint
-                            }}
+                            style={{ color: config.styles.colours.text.faint }}
                         >Select Category</MenuItem>
                         {categoryItems}
                     </Select>
@@ -378,18 +425,13 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                     <Select
                         value={this.state.page.subcategory}
                         onChange={(e) => { this.handleFormChange(e) }}
-                        inputProps={{
-                            name: 'subcategory'
-                        }}
+                        inputProps={{ name: 'subcategory' }}
                         style={{ textTransform: 'capitalize' }}
                         disabled={this.state.page.category.length === 0}
                     >
-                        <MenuItem 
-                            value=''
-                            style={{
-                                color: config.styles.colours.text.faint
-                            }}
-                        >Select Subcategory</MenuItem>
+                        <MenuItem value='' style={{ color: config.styles.colours.text.faint }}>
+                            Select Subcategory
+                        </MenuItem>
                         {subcategoryItems}
                     </Select>
                 </FormControl>
@@ -398,13 +440,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormDetails() {
-        return <DetailsInputList 
-                    details={this.state.page.details}
-                    onAdd={this.handleDetailsFormChange}
-                />
+        return <DetailsInputList details={this.state.page.details} onAdd={this.handleDetailsFormChange} />
     }
 
-    renderFormQuill(editor: string) {
+    renderFormQuill(editor: string, formats?: string[]) {
         const isFocused = this.state.quillFocus === editor || this.state.page[editor as string].length !== 0;
         return (
             <QuillEditor
@@ -412,6 +451,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 value={this.state.page[editor]}
                 formStyles={inputStyle}
                 isFocused={isFocused}
+                formats={formats !== undefined ? formats : undefined}
                 sanitize={this.props.WikiApiClient.sanitizeQuillLink}
                 onChange={this.handleQuillFormChange}
                 onFocus={this.handleQuillFocus}
@@ -421,20 +461,14 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     render() {
-        console.log(this.state);
-
         return(
             <div style={{ ...config.styles.container, marginTop: 100, }}>
                 <Card square style={{ marginBottom: config.styles.spacing.default }}>
                     <CardHeader
                         action={
                             <div>
-                                <IconButton onClick={this.props.history.goBack}>
-                                    <CancelIcon />
-                                </IconButton>
-                                <IconButton component={Link} to={config.routes.wiki.root}>
-                                    <HomeIcon />
-                                </IconButton>
+                                <IconButton onClick={this.props.history.goBack}><CancelIcon /></IconButton>
+                                <IconButton component={Link} to={config.routes.wiki.root}><HomeIcon /></IconButton>
                             </div>
                         }
                         title='Page Creator'
@@ -444,15 +478,16 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         {this.renderFormTitle()}
                         {this.renderFormCategorySubcategory()}
                         {this.renderFormDetails()}
-                        {this.renderFormQuill('preface')}
+                        {this.renderFormQuill(
+                            'preface',
+                            ['bold', 'italic', 'underline', 'strike', 'blockquote', 'indent', 'link', 'image']
+                        )}
                         {this.renderFormQuill('body')}
                         {this.renderFormOtherImages()}
                     </CardContent>
                     <CardActions style={{ marginBottom: config.styles.spacing.default }}>
                         { this.state.page.id.length > 0 &&
-                            <IconButton onClick={this.handleDelete}>
-                                <DeleteIcon />
-                            </IconButton>
+                            <IconButton onClick={this.handleDelete}><DeleteIcon /></IconButton>
                         }
                         <Button 
                             onClick={this.handleSave}
@@ -468,6 +503,13 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         </Button>
                     </CardActions>
                 </Card>
+                <Alert
+                    open={this.state.alert.open}
+                    title={this.state.alert.title}
+                    message={this.state.alert.message}
+                    close={this.state.alert.close}
+                    confirm={this.state.alert.confirm}
+                />
             </div>
         );
     }

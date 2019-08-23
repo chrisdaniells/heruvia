@@ -9,8 +9,9 @@ import { IDefaultResponse } from './api.interfaces';
 import { IPage } from '@interfaces';
 
 class WikiApiServer extends ApiServer {
+
     private archiveFile(page: IPage) : boolean {
-        const fileToArchive = config.paths.wikiarchive + page.url + '.json';
+        const fileToArchive = config.paths.wikiarchive + page.id + '.json';
 
         let data = [];
 
@@ -55,21 +56,33 @@ class WikiApiServer extends ApiServer {
         return this.generateDefaultResponse(status, status ? file : {});
     }
 
-    public updatePageById(id: string, data: IPage) : IDefaultResponse {
-        if (!id || !data) return this.generateDefaultResponse(false);
+    public updatePageById(page: IPage, newPage: boolean): IDefaultResponse {
+        if (!page) return this.generateDefaultResponse(false);
 
-        let file = config.paths.wikipages + id + '.json';
+        if (page.id.length) {
+            let file = page.id + '.json';
 
-        if (fs.existsSync(file)) {
-            this.deleteFile(file, config.paths.wikipages);
-            if (fs.existsSync(file)) return;
+            if (fs.existsSync(config.paths.wikipages + file)) {
+                this.archiveFile(page);
+                this.deleteFile(file, config.paths.wikipages);
+                if (fs.existsSync(config.paths.wikipages + file)) {
+                    return this.generateDefaultResponse(false);
+                }
+            }
+        } else {
+            page.date_created = Date.toString();
         }
 
-        if (data.title !== id) file = config.paths.wikipages + data.url + '.json';
+        if (page.title.length === 0) return this.generateDefaultResponse(false);
 
-        fs.writeFileSync(file, JSON.stringify(data));
+        const newId = this.getPageIdFromTitle(page.title);
+        page.id = newId,
+        page.url = newId; 
+        page.last_updated = Date.toString();
 
-        this.archiveFile(data);
+        fs.writeFileSync(config.paths.wikipages + page.id + '.json', JSON.stringify(page));
+
+        return this.generateDefaultResponse(true);
     }
 
     public deletePageById(id: string): IDefaultResponse {
@@ -97,7 +110,7 @@ class WikiApiServer extends ApiServer {
     }
 
     public uploadImages(images: string[]) : IDefaultResponse {
-        if (!images || images.length) return this.generateDefaultResponse(false);
+        if (images === undefined || images.length === 0) return this.generateDefaultResponse(false);
 
         let filenames: string[] = [];
         images.forEach(image => {
@@ -111,6 +124,10 @@ class WikiApiServer extends ApiServer {
         const status: boolean = filenames.length > 0;
     
         return this.generateDefaultResponse(status, filenames);
+    }
+
+    public getPageIdFromTitle(title: string) {
+        return title.trim().replace(/\s+/g, '_');
     }
 }
 

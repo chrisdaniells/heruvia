@@ -45,6 +45,8 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
     constructor(props: IWikiAppProps, state: IWikiAppState) {
         super(props, state);
 
+        console.log(this.props);
+
         const pagesResponse: IDefaultResponse = this.props.WikiApiClient.getAllPages();
 
         this.state = {

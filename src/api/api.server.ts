@@ -4,6 +4,7 @@ const fs = (window as any).require('fs');
 const path = (window as any).require('path');
 
 abstract class ApiServer {
+    
     protected deleteFile(filename: string, path: string) : boolean {
         const fileToDelete = path + filename;
         if (!fs.existsSync(fileToDelete)) return true;
@@ -29,8 +30,6 @@ abstract class ApiServer {
     }
 
     public isFileById(id: string, filename: string) {
-        console.log(id);
-        console.log(filename);
         return path.basename(filename, '.json').toLowerCase() === id.toLowerCase();
     }
 

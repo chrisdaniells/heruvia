@@ -9,11 +9,18 @@ import {
     DialogTitle,
 } from '@material-ui/core'
 
-interface IAlertProps {
+export interface IAlertProps {
     open: boolean;
     title?: string;
     message?: string;
-    onClose(): void;
+    close: {
+        onClose: any;
+        label: string;
+    } | false;
+    confirm: {
+        onConfirm: any;
+        label: string;
+    } | false;    
 }
 
 interface IAlertState {
@@ -25,10 +32,12 @@ export default class Alert extends React.Component<IAlertProps, IAlertState> {
     }
 
     render() {
+        if (!this.props.close) return null;
+
         return (
             <Dialog
                 open={this.props.open}
-                onClose={this.props.onClose}
+                onClose={this.props.close.onClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -43,8 +52,13 @@ export default class Alert extends React.Component<IAlertProps, IAlertState> {
                     </DialogContent>
                 }
                 <DialogActions>
-                <Button onClick={this.props.onClose} color="primary">
-                    OK
+                {this.props.confirm &&
+                    <Button onClick={this.props.confirm.onConfirm}>
+                        {this.props.confirm.label}
+                    </Button>
+                }
+                <Button onClick={this.props.close.onClose} color="primary">
+                    {this.props.close.label}
                 </Button>
                 </DialogActions>
             </Dialog>
