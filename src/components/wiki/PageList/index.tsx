@@ -24,6 +24,7 @@ import {
 interface IPageListProps {
     pages: IPage[],
     prefaceLength?: number,
+    edit?: boolean,
 }
 
 export default class PageList extends React.Component<IPageListProps, any> {
@@ -70,16 +71,18 @@ export default class PageList extends React.Component<IPageListProps, any> {
                             </React.Fragment>
                         }
                     />
-                    <ListItemSecondaryAction>
-                        <IconButton
-                            component={Link}
-                            to={config.routes.wiki.edit + '/' + page.id}
-                            edge='end' 
-                            aria-label='edit'
-                        >                        
-                            <EditIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
+                    {this.props.edit && 
+                        <ListItemSecondaryAction>
+                            <IconButton
+                                component={Link}
+                                to={config.routes.wiki.edit + '/' + page.id}
+                                edge='end' 
+                                aria-label='edit'
+                            >                        
+                                <EditIcon />
+                            </IconButton>
+                        </ListItemSecondaryAction>
+                    }
                 </ListItem>      
             )
         });

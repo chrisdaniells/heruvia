@@ -56,7 +56,7 @@ class WikiApiServer extends ApiServer {
         return this.generateDefaultResponse(status, status ? file : {});
     }
 
-    public updatePageById(page: IPage, newPage: boolean): IDefaultResponse {
+    public updatePage(page: IPage, newPage: boolean): IDefaultResponse {
         if (!page) return this.generateDefaultResponse(false);
 
         if (page.id.length) {
@@ -70,7 +70,7 @@ class WikiApiServer extends ApiServer {
                 }
             }
         } else {
-            page.date_created = Date.toString();
+            page.date_created = Date.now();
         }
 
         if (page.title.length === 0) return this.generateDefaultResponse(false);
@@ -78,7 +78,7 @@ class WikiApiServer extends ApiServer {
         const newId = this.getPageIdFromTitle(page.title);
         page.id = newId,
         page.url = newId; 
-        page.last_updated = Date.toString();
+        page.last_updated = Date.now();
 
         fs.writeFileSync(config.paths.wikipages + page.id + '.json', JSON.stringify(page));
 
@@ -88,6 +88,9 @@ class WikiApiServer extends ApiServer {
     public deletePageById(id: string): IDefaultResponse {
         if (!id.length) return this.generateDefaultResponse(false);
 
+        const pageRes = this.getPageById(id);
+        if (pageRes.status) this.archiveFile(pageRes.data);
+
         const status = this.deleteFile(id + '.json', config.paths.wikipages);
 
         return this.generateDefaultResponse(status);
@@ -96,17 +99,17 @@ class WikiApiServer extends ApiServer {
     public getArchiveById(id: string) {
         if (!id) return this.generateDefaultResponse(false);
 
-        const files = this.readDirectory(config.paths.wikiarchive).filter(file => {
-            this.isJsonFile(config.paths.wikiarchive + file.name);
-        });
+        const archiveFile = fs.readdirSync(config.paths.wikiarchive, {withFileTypes: true})
+            .filter((file: any) => this.isJsonFile(file.name))
+            .find(file => { 
+                return this.isFileById(id, file.name);
+            });
 
-        const archive = files.find(file => { 
-            return this.isFileById(id, file.name);
-        });
+        const status = archiveFile !== undefined;
 
-        const status = archive !== undefined;
+        const archive = status ? this.parseJsonFromFile(config.paths.wikiarchive + archiveFile.name) : [];
 
-        return this.generateDefaultResponse(status, status ? archive : [] )
+        return this.generateDefaultResponse(status, archive);
     }
 
     public uploadImages(images: string[]) : IDefaultResponse {
@@ -128,6 +131,26 @@ class WikiApiServer extends ApiServer {
 
     public getPageIdFromTitle(title: string) {
         return title.trim().replace(/\s+/g, '_');
+    }
+
+    public getPageTitleFromId(id: string) {
+        return id.trim().replace(/_/g, ' ');
+    }
+
+    public convertLegacy() {
+        const pagesResponse = this.getAllPages();
+        if (pagesResponse.status) {
+            pagesResponse.data.forEach(page => {
+                page.preface = page.preface.replace('<a href="#/view/', '<a href-"#/wiki/page');
+                page.body = page.body.replace('<a href="#/view/', '<a href-"#/wiki/page');
+                page.details = page.details.map(detail => {
+                    detail.link = ''
+                    return detail;
+                })
+
+                this.updatePage(page, false);
+            });
+        }
     }
 }
 

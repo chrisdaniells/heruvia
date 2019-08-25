@@ -9,7 +9,9 @@ import config from './config';
 import { SearchApiClient, WikiApiClient } from '@api';
 
 import WikiApp from '@apps/Wiki';
+import WikiPage from '@apps/wiki/Page';
 import WikiEdit from '@apps/Wiki/Edit';
+import WikiListing from '@apps/Wiki/Listing';
 import LanguagesApp from '@apps/Languages';
 import NotesApp from '@apps/Notes';
 import TimelineApp from '@apps/Timeline';
@@ -40,7 +42,11 @@ ReactDOM.render((
 
                     <Route
                         path='/wiki/list/:attribute/:value'
-                        render={(props) => (<WikiApp {...props} {...WikiAppProps} />)}
+                        render={(props) => (<WikiListing {...props} {...WikiAppProps} />)}
+                    />
+                    <Route 
+                        path={config.routes.wiki.page + '/:id'}
+                        render={(props) => (<WikiPage {...props} {...WikiAppProps} />)} 
                     />
                     <Route 
                         path={config.routes.wiki.edit + '/:id?'}

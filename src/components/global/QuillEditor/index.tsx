@@ -37,19 +37,12 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
         const QuillLink = class QuillLink extends Quill.import('formats/link') {
             static create(value) {
                 let node = super.create(value);
-                value = this.sanitize(value);
+                value = sanitize(value);
                 node.setAttribute('href', value);
-                if(value.startsWith('#')) {
+                if (value.startsWith('#')) {
                     node.removeAttribute('target');
                 }
                 return node;
-            }
-            
-            static sanitize(url: string) {
-                if (sanitize !== null) {
-                    url = sanitize(url);
-                }
-                return url;
             }
         };
 
@@ -81,6 +74,7 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                     >{this.props.id}</InputLabel>
                     <BodyEditor
                         id={this.props.id}
+                        className="heruvia-text"
                         value={this.props.value}
                         onChange={(content) => { this.props.onChange(this.props.id, content) }}
                         onFocus={() => { this.props.onFocus(this.props.id) }}

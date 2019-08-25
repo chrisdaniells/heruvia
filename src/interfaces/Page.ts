@@ -15,12 +15,13 @@ export interface IPage {
     details: IDetailsItem[];
     body: string;
     preface: string;
-    date_created: string;
-    last_updated: string;
+    date_created: number;
+    last_updated: number;
     [key: string]: any;
 }
 
 export interface IDetailsItem {
     label: string;
     value: string;
+    link?: boolean;
 }

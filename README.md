@@ -1,1 +1,0 @@
-# Heruvia Encyclopaedia

@@ -1,7 +1,8 @@
 import path from 'path';
 
-import categoriesConfig from './config.categories';
+import categoriesConfig from './config.wiki.categories';
 import stylesConfig from './config.styles';
+import templatesConfig from './config.wiki.templates';
 
 const config: { [key: string] : any } = {
     paths: {
@@ -16,11 +17,15 @@ const config: { [key: string] : any } = {
             root: '/wiki',
             page: '/wiki/page',
             edit: '/wiki/edit',
+            list: '/wiki/list',
         }
     },
-    categories: categoriesConfig,
+    wiki: {
+        categories: categoriesConfig,
+        templates: templatesConfig,
+    },
     styles: stylesConfig,
-}
 
+}
 
 export default config;

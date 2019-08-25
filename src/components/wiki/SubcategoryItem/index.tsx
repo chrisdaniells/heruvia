@@ -32,11 +32,11 @@ export default class SubcategoryItem extends React.Component<ICategoryItemProps,
 
     render() {
         return (
-            <ListItem 
+            <ListItem
                 button 
                 style={{ textTransform: "capitalize" }}
                 component={Link}
-                to={"/wiki/list/" + this.props.category + "/" + this.props.subcategory}
+                to={"/wiki/list/subcategory/" + this.props.subcategory}
             >
                 {this.renderIcon()}
                 <ListItemText primary={this.props.subcategory} />

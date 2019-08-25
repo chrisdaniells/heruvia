@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import queryString from 'query-string';
 
 import { SearchApiClient, WikiApiClient } from '@api';
 import { IPage, IDetailsItem } from '@interfaces';
@@ -16,7 +17,7 @@ import {
     MenuItem, Select,
 } from '@material-ui/core';
 import {
-    ArrowBack as CancelIcon,
+    ArrowBack as BackIcon,
     Clear as ClearIcon,
     Delete as DeleteIcon,
     Home as HomeIcon,
@@ -29,18 +30,13 @@ interface IEditProps {
     WikiApiClient: WikiApiClient;
     match?: any;
     history?: any;
+    location?: any;
 }
 
 interface IEditState {
     page: IPage | null;
     quillFocus: string | null;
-    alert: {
-        open: boolean;
-        title?: string;
-        message?: string;
-        close: any | false;
-        confirm: any | false;
-    }
+    alert: IAlertProps
 }
 
 const inputStyle = {
@@ -58,10 +54,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
             const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
             if (pageResponse.status) {
                 page = pageResponse.data;
-                if (!config.categories.hasOwnProperty(page.category)) {
+                if (!config.wiki.categories.hasOwnProperty(page.category)) {
                     page.category = '',
                     page.subcategory ='';
-                } else if (!config.categories[page.category].includes(page.subcategory)) {
+                } else if (!config.wiki.categories[page.category].includes(page.subcategory)) {
                     page.subcategory = '';
                 }
             } else {
@@ -75,6 +71,14 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                     },
                     confirm: false,
                 };
+            }
+        } else if (this.props.location.search.length) {
+            const parsed = queryString.parse(this.props.location.search);
+            if (parsed.template) {
+                page = this.props.WikiApiClient.getPageTemplate(parsed.template as string);
+            }
+            if (parsed.create) {
+                page.title = this.props.WikiApiClient.getPageTitleFromId(parsed.create as string);
             }
         }
 
@@ -205,7 +209,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
 
         if (!validation.status) {
             const messages = validation.data.map(message => {
-                return <p>{message}</p>;
+                return <span key={message}>{message}</span>;
             });
             this.setState({
                 alert: {
@@ -220,7 +224,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 }
             });
         } else {
-            this.props.WikiApiClient.updatePageById(this.state.page, this.state.page.id.length === 0);
+            this.props.WikiApiClient.updatePage(this.state.page, this.state.page.id.length === 0);
+            this.props.history.push({ 
+                pathname: config.routes.wiki.page + '/' + this.props.WikiApiClient.getPageIdFromTitle(this.state.page.title)
+            });
         }
     }
 
@@ -381,8 +388,8 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     renderFormCategorySubcategory() {
         let categoryItems: any[] = [];
         let subcategoryItems: any[] = [];
-        for (let category in config.categories) {
-            if (!config.categories.hasOwnProperty(category)) continue;
+        for (let category in config.wiki.categories) {
+            if (!config.wiki.categories.hasOwnProperty(category)) continue;
             categoryItems.push(
                 <MenuItem
                     key={category}
@@ -392,7 +399,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
             );
         }
         if (this.state.page.category.length > 0) {
-            config.categories[this.state.page.category].forEach(subcategory => {
+            config.wiki.categories[this.state.page.category].forEach(subcategory => {
                 subcategoryItems.push(
                     <MenuItem 
                         key={subcategory}
@@ -462,18 +469,18 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
 
     render() {
         return(
-            <div style={{ ...config.styles.container, marginTop: 100, }}>
+            <div style={{ ...config.styles.container, marginTop: 100 }}>
                 <Card square style={{ marginBottom: config.styles.spacing.default }}>
                     <CardHeader
                         action={
                             <div>
-                                <IconButton onClick={this.props.history.goBack}><CancelIcon /></IconButton>
+                                <IconButton onClick={this.props.history.goBack}><BackIcon /></IconButton>
                                 <IconButton component={Link} to={config.routes.wiki.root}><HomeIcon /></IconButton>
                             </div>
                         }
                         title='Page Creator'
                     />
-                    <CardContent>
+                    <CardContent style={{ padding: config.styles.spacing.default }}>
                         {this.renderFormMainImage()}
                         {this.renderFormTitle()}
                         {this.renderFormCategorySubcategory()}

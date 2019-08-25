@@ -4,6 +4,7 @@ import { IDefaultResponse } from './api.interfaces';
 import { ISource } from './api.search.client';
 import { IPage } from '@interfaces';
 import { DataSources } from '@enums';
+
 import config from '@config';
 
 class WikiApiClient {
@@ -32,6 +33,10 @@ class WikiApiClient {
         return this.WikiApiServer.getPageById(id);
     }
 
+    public getArchiveById(id: string) : IDefaultResponse {
+        return this.WikiApiServer.getArchiveById(id);
+    }
+
     public getPagesByAttribute(attribute: string, value: string) : IDefaultResponse {
         return this.WikiApiServer.getPagesByAttribute(attribute, value);
     }
@@ -40,8 +45,13 @@ class WikiApiClient {
         return this.WikiApiServer.deletePageById(id);
     }
 
-    public updatePageById(data: IPage, newId: boolean) : IDefaultResponse {
-        return this.WikiApiServer.updatePageById(data, newId);
+    public updatePage(data: IPage, newId: boolean) : IDefaultResponse {
+        return this.WikiApiServer.updatePage(data, newId);
+    }
+
+    public restoreArchive(data: IPage): IDefaultResponse {
+        data.last_updated = Date.now();
+        return this.updatePage(data, false);
     }
 
     public uploadImages(images: string[]) : IDefaultResponse {
@@ -75,36 +85,27 @@ class WikiApiClient {
     }
 
     public getPageTemplate(template?: string) : IPage {
-        let PageTemplate: IPage = {
-            id: '',
-            url: '',
-            title: '',
-            category: '',
-            subcategory: '',
-            images: {
-                main: '',
-                other: [],
-            },
-            details: [],
-            body: '',
-            preface: '',
-            date_created: '',
-            last_updated: '',
-        }
+        let PageTemplate = config.wiki.templates.base;
 
         if (template) {
-            
+            if (Object.keys(config.wiki.templates).some(t => t.toLowerCase() === template.toLowerCase())) {
+                PageTemplate = config.wiki.templates[template];
+            }
         }
 
-        return PageTemplate;
+        return { ...PageTemplate };
     }
 
     public getPageIdFromTitle(title: string) {
         return this.WikiApiServer.getPageIdFromTitle(title);
     }
 
+    public getPageTitleFromId(id: string) {
+        return this.WikiApiServer.getPageTitleFromId(id);
+    }
+
     public sanitizeQuillLink(url: string) {
-        if (url[0] == '#') { 
+        if (url[0] == '#') {
             url = url.replace('#', '');
             url = url.replace(config.routes.wiki.page + '/', '');
             url = '#' + config.routes.wiki.page + '/' + url.trim().replace(/\s+/g, '_');

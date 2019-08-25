@@ -161,6 +161,7 @@ export default class Header extends React.Component<any, IHeaderState> {
                             button
                             component={Link}
                             to='/wiki'
+                            onClick={this.toggleDrawer}
                         >
                             <ListItemIcon>
                                 <PublicIcon />
@@ -171,6 +172,7 @@ export default class Header extends React.Component<any, IHeaderState> {
                             button
                             component={Link}
                             to='/languages'
+                            onClick={this.toggleDrawer}
                         >
                             <ListItemIcon>
                                 <ChatIcon />
@@ -181,6 +183,7 @@ export default class Header extends React.Component<any, IHeaderState> {
                             button
                             component={Link}
                             to='/timeline'
+                            onClick={this.toggleDrawer}
                         >
                             <ListItemIcon>
                                 <TimelineIcon />
@@ -191,6 +194,7 @@ export default class Header extends React.Component<any, IHeaderState> {
                             button
                             component={Link}
                             to='/notes'
+                            onClick={this.toggleDrawer}
                         >
                             <ListItemIcon>
                                 <BookIcon />
