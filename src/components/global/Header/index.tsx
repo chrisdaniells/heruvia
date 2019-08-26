@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
 
 import config from '@config';
 import { DataSources } from '@enums';
@@ -33,7 +34,7 @@ interface IHeaderState {
     searchResults: any[];
 }
 
-export default class Header extends React.Component<any, IHeaderState> {
+class Header extends React.Component<any, IHeaderState> {
 
     private searchTimer: any;
 
@@ -47,6 +48,7 @@ export default class Header extends React.Component<any, IHeaderState> {
             searchResults: [],
         }
 
+        this.refreshSearch = this.refreshSearch.bind(this);
         this.toggleDrawer = this.toggleDrawer.bind(this);
         this.handleInputClick = this.handleInputClick.bind(this);
         this.handleSearchInput = this.handleSearchInput.bind(this);
@@ -64,6 +66,17 @@ export default class Header extends React.Component<any, IHeaderState> {
         );
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.location.pathname !== prevProps.location.pathname) {
+            this.refreshSearch();
+        }
+    }
+
+    refreshSearch() {
+        const getAllPagesResponse = this.props.WikiApiClient.getAllPages();
+        this.props.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
+    }
+
     toggleDrawer(): void {
         const { drawerOpen } = { ...this.state };
         this.setState({
@@ -76,10 +89,6 @@ export default class Header extends React.Component<any, IHeaderState> {
         const searchTerm = e.currentTarget.value;
 
         this.searchTimer = setTimeout(() => {
-            const getAllPagesResponse = this.props.WikiApiClient.getAllPages();
-    
-            this.props.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
-    
             const searchResults = searchTerm.length >= 2 ?
                 this.props.SearchApiClient.getSearchResults(searchTerm) : [];
     
@@ -207,3 +216,5 @@ export default class Header extends React.Component<any, IHeaderState> {
         )
     }
 }
+
+export default withRouter(Header);

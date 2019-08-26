@@ -459,7 +459,6 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 formStyles={inputStyle}
                 isFocused={isFocused}
                 formats={formats !== undefined ? formats : undefined}
-                sanitize={this.props.WikiApiClient.sanitizeQuillLink}
                 onChange={this.handleQuillFormChange}
                 onFocus={this.handleQuillFocus}
                 onBlur={this.handleQuillFocus}

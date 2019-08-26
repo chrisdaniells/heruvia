@@ -21,7 +21,7 @@ class WikiApiClient {
         this.cacheTime = 5000
     }
 
-    public getAllPages() : IDefaultResponse {
+    public getAllPages() : IDefaultResponse { 
         if (Date.now() - this.cacheTimeStamp > this.cacheTime || this.cachedAllPagesResponse === undefined) {
             this.cachedAllPagesResponse = this.WikiApiServer.getAllPages();
             this.cacheTimeStamp = Date.now();
@@ -102,15 +102,6 @@ class WikiApiClient {
 
     public getPageTitleFromId(id: string) {
         return this.WikiApiServer.getPageTitleFromId(id);
-    }
-
-    public sanitizeQuillLink(url: string) {
-        if (url[0] == '#') {
-            url = url.replace('#', '');
-            url = url.replace(config.routes.wiki.page + '/', '');
-            url = '#' + config.routes.wiki.page + '/' + url.trim().replace(/\s+/g, '_');
-        };
-        return url;
     }
 
     public validatePage(page: IPage): IDefaultResponse {

@@ -18,14 +18,22 @@ const config: { [key: string] : any } = {
             page: '/wiki/page',
             edit: '/wiki/edit',
             list: '/wiki/list',
-        }
+        },
+        language: {
+            page: '/language',
+        },
+        timeline: {
+            page: '/timeline',
+        },
+        todo: {
+            page: '/todo',
+        },
     },
     wiki: {
         categories: categoriesConfig,
         templates: templatesConfig,
     },
     styles: stylesConfig,
-
 }
 
 export default config;

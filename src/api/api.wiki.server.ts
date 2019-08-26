@@ -143,10 +143,8 @@ class WikiApiServer extends ApiServer {
             pagesResponse.data.forEach(page => {
                 page.preface = page.preface.replace('<a href="#/view/', '<a href-"#/wiki/page');
                 page.body = page.body.replace('<a href="#/view/', '<a href-"#/wiki/page');
-                page.details = page.details.map(detail => {
-                    detail.link = ''
-                    return detail;
-                })
+                page.date_created = Date.parse(page.date_created);
+                page.last_updated = Date.parse(page.last_updated);
 
                 this.updatePage(page, false);
             });

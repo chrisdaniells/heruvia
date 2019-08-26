@@ -14,7 +14,6 @@ interface IQuillEditorProps {
     onChange(id: string, content: string): any;
     onFocus(id: string): any;
     onBlur(): any;
-    sanitize?: any;
 }
 
 export default class QuillEditor extends React.Component<IQuillEditorProps, any> {
@@ -30,19 +29,19 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
     }
 
     sanitizeQuill() {
-        let sanitize = null;
-        if (this.props.sanitize !== undefined) {
-            sanitize = this.props.sanitize;
-        }
         const QuillLink = class QuillLink extends Quill.import('formats/link') {
             static create(value) {
                 let node = super.create(value);
-                value = sanitize(value);
+                value = this.sanitize(value);
                 node.setAttribute('href', value);
                 if (value.startsWith('#')) {
                     node.removeAttribute('target');
                 }
                 return node;
+            }
+
+            static sanitize(url: string) {
+                return sanitizeLink(url);
             }
         };
 
@@ -91,4 +90,27 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
             </div>
         );
     }
+}
+
+export function sanitizeLink(url, stripHash: boolean = false) {
+    switch (url[0]) {
+        case '?':
+            url = url.replace('?', '');
+            url = (!stripHash ? '#' : '') + config.routes.wiki.page + '/' + url.trim().replace(/\s+/g, '_');
+            break;
+        case '!':
+            url = url.replace('!', '');
+            url = (!stripHash ? '#' : '') + config.routes.language.page + '/' + url.trim().replace(/\s+/g, '_');
+            break;
+        case '@':
+            url = url.replace('@', '');
+            url = (!stripHash ? '#' : '') + config.routes.timeline.page + '/' + url.trim().replace(/\s+/g, '_');
+            break;
+        case '&':
+            url = url.replace('&', '');
+            url = (!stripHash ? '#' : '') + config.routes.todo.page + '/' + url.trim().replace(/\s+/g, '_');
+            break;
+    }
+
+    return url;
 }

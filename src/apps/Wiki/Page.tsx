@@ -23,6 +23,8 @@ import {
 
 import Alert, { IAlertProps } from '@components/global/Alert';
 import CreatePageButton from '@components/wiki/CreatePageButton';
+import ImageGallery from '@components/global/ImageGallery';
+import { sanitizeLink } from '@components/global/QuillEditor';
 
 import { IPage } from '@interfaces';
 
@@ -141,6 +143,8 @@ export default class Page extends React.Component<IPageProps, IPageState> {
             const isFirst = (index === 0);
             const isLast = (this.state.page.details.length-1 === index);
 
+            const isLink = ['?', '!', '@', '&'].indexOf(detail.value[0]) > -1;
+
             details.push(
                 <Grid
                     container 
@@ -152,7 +156,11 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                     }}
                 >
                     <Grid item xs={6}>{detail.label}</Grid>
-                    <Grid item xs={6}>{detail.value}</Grid>
+                    <Grid
+                        item xs={6}
+                    >
+                        {isLink ? <Link to={sanitizeLink(detail.value, true)}>{detail.value.substring(1, detail.value.length)}</Link> : detail.value}
+                    </Grid>
                 </Grid>
             );
         });
@@ -309,6 +317,12 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                     }
                                 </Grid>
                                 <div className='wiki-body heruvia-text'>{ReactHtmlParser(page.body)}</div>
+                                
+                                {this.state.page.images.other.length > 0 &&
+                                    <div style={{ marginTop: 60 }}>
+                                        <ImageGallery images={this.state.page.images.other} />
+                                    </div>
+                                }
                             </div>
                         }
                     </CardContent>

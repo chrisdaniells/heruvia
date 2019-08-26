@@ -53,6 +53,7 @@ class SearchApiClient {
             if (source.name === name) {
                 files = this.reduceFiles(files, [...source.props, source.target]);
                 this.sources[index].files = files;
+                this.searchers[name] = new FuzzySearch(this.sources[index].files, [this.sources[index].target], {sort: true});
                 return true;
             }
             return false;
@@ -83,7 +84,7 @@ class SearchApiClient {
             }
         }
         
-        return results;
+        return [...results];
     }
 }
 
