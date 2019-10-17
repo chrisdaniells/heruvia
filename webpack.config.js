@@ -21,7 +21,7 @@ module.exports = {
                 test: /\.ts|\.tsx$/,
                 exclude: [
                     /node_modules/,
-                    path.join(__dirname, '/src/apps/Languages/generators/'),
+                    path.join(__dirname, '/src/apps/Languages/generators/'), 
                 ],
                 loader: "ts-loader"
             }
