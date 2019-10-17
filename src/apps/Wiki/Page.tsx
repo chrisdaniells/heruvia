@@ -19,6 +19,7 @@ import {
     ArrowBack as BackIcon,
     Edit as EditIcon,
     Home as HomeIcon,
+    Print as PrintIcon,
 } from '@material-ui/icons';
 
 import Alert, { IAlertProps } from '@components/global/Alert';
@@ -209,6 +210,15 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                         action={
                             <div>
                                 <IconButton onClick={this.props.history.goBack}><BackIcon /></IconButton>
+                                {page !== null &&
+                                    <IconButton 
+                                        component={Link}
+                                        to={config.routes.wiki.print + '/' + page.id}
+                                        target='_blank'
+                                    >
+                                        <PrintIcon />
+                                    </IconButton>
+                                }
                                 {page !== null &&
                                     <IconButton 
                                         component={Link}

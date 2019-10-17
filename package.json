@@ -9,14 +9,19 @@
     "build": "webpack --progress",
     "watch": "webpack --watch --progress",
     "bs": "webpack && npm start",
-    "package": "npm run build && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite"
+    "package": "npm run build && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite",
+    "ub": "babel src/apps/Languages/generators/Ussurian -d lib --extensions \".ts\" && node lib/generate.js",
+    "u": "node lib/generate.js"
   },
   "author": "Christopher Daniells",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.6.0",
     "@babel/core": "^7.4.3",
+    "@babel/node": "^7.6.1",
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.6.0",
     "@material-ui/core": "^4.3.1",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/types": "^4.1.1",

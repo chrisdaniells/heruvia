@@ -114,7 +114,7 @@ class Header extends React.Component<any, IHeaderState> {
 
     render() {
         return (
-            <div>
+            <div id='Header'>
                 <AppBar 
                     position='fixed'
                     style={{

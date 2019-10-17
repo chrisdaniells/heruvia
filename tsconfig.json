@@ -18,6 +18,7 @@
       "@enums": ["enums/index"],
       "@interfaces": ["interfaces/index"],
       "@root/*": ["./*"],
+      "@language/*": ["apps/Languages/generators/*"]
     }
   }
 }

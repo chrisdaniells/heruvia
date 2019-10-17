@@ -39,7 +39,10 @@ const CategoryConfig = {
         SubCategories.TheAgeOfEmpires,
         SubCategories.TheAgeOfRaces,
         SubCategories.TheAgeOfCreation,
-    ]
+    ],
+    [Categories.Saga]: [
+        SubCategories.Resources,
+    ],
 };
 
 export default CategoryConfig;

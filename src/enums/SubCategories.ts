@@ -6,7 +6,7 @@ import {
     Texture, Restaurant, VpnKey, Stars, Colorize, Android,
     Pets, LocalFlorist, LocationCity, Landscape, Place,
     Map as MapIcon, Waves, Visibility, Build, Loop, BrightnessLow,
-    PanTool, Palette,
+    PanTool, Palette, Info,
 } from '@material-ui/icons';
 
 enum SubCategories {
@@ -39,6 +39,7 @@ enum SubCategories {
     TheAgeOfEmpires = 'the age of empires',
     TheAgeOfRaces = 'the age of races',
     TheAgeOfCreation = 'the age of creation',
+    Resources = 'resources'
 }
 
 const SubCategoryIcons: { [key: string ]: any } = {
@@ -71,6 +72,7 @@ const SubCategoryIcons: { [key: string ]: any } = {
     TheAgeOfEmpires: BrightnessLow,
     TheAgeOfRaces: PanTool,
     TheAgeOfCreation: Palette,
+    Resources: Info,
 }
 
 export { SubCategories, SubCategoryIcons };

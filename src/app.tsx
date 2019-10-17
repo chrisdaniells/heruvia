@@ -12,6 +12,7 @@ import WikiApp from '@apps/Wiki';
 import WikiPage from '@apps/wiki/Page';
 import WikiEdit from '@apps/Wiki/Edit';
 import WikiListing from '@apps/Wiki/Listing';
+import WikiPrint from '@apps/Wiki/Print';
 import LanguagesApp from '@apps/Languages';
 import NotesApp from '@apps/Notes';
 import TimelineApp from '@apps/Timeline';
@@ -51,6 +52,10 @@ ReactDOM.render((
                     <Route 
                         path={config.routes.wiki.edit + '/:id?'}
                         render={(props) => (<WikiEdit {...props} {...WikiAppProps} />)} 
+                    />
+                    <Route 
+                        path={config.routes.wiki.print + '/:id'}
+                        render={(props) => (<WikiPrint {...props} {...WikiAppProps} />)} 
                     />
                     <Route 
                         exact 

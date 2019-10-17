@@ -4,6 +4,7 @@ enum Categories {
     Ecology = 'ecology',
     Geography = 'geography',
     History = 'history',
+    Saga = 'saga',
 }
 
 export { Categories };

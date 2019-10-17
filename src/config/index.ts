@@ -18,6 +18,7 @@ const config: { [key: string] : any } = {
             page: '/wiki/page',
             edit: '/wiki/edit',
             list: '/wiki/list',
+            print: '/wiki/print',
         },
         language: {
             page: '/language',
