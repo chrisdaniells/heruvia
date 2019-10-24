@@ -47,7 +47,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     constructor(props: IEditProps, state: IEditState) {
         super(props, state);
 
-        let page: IPage = this.props.WikiApiClient.getPageTemplate();
+        let page: IPage = JSON.parse(JSON.stringify(this.props.WikiApiClient.getPageTemplate()));
         let alert: IAlertProps = { open: false, title: '', message: '', close: false, confirm: false };
 
         if (this.props.match.params.id !== undefined) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import BodyEditor, { Quill } from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill';
 
 import { FormControl, InputLabel } from '@material-ui/core';
 
@@ -16,12 +16,30 @@ interface IQuillEditorProps {
     onBlur(): any;
 }
 
+function insertSymbol(symbol: string) {
+    const cursorPosition = this.quill.getSelection().index;
+    this.quill.insertText(cursorPosition, symbol);
+    this.quill.setSelection(cursorPosition + 1);
+    return symbol;
+}
+
+const consonants = [
+    "Đ", "ð", "Ç", "ç", "Ћ", "þ", "Ş", "ş",
+];
+const vowels = [
+    "Ä", "ä", "Ã", "ã", "ë", "Ẽ", "ẽ", "Ï", "ï", "Ö", "ö", "Õ", "õ", "Ü", "ü", "Ũ", "ũ",
+];
+const symbols = [
+    "♀", "♂", "»", "П", "Ń", "И", "Џ", "Ŋ", "Ф", "Ө", "Ø",
+];
+
 export default class QuillEditor extends React.Component<IQuillEditorProps, any> {
 
     constructor(props: IQuillEditorProps, state: any) {
         super(props);
 
         this.sanitizeQuill = this.sanitizeQuill.bind(this);
+        this.getToolbar = this.getToolbar.bind(this);
     }
 
     componentDidMount() {
@@ -48,6 +66,69 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
         Quill.register(QuillLink);
     }
 
+    getToolbar() {
+        return (
+            <div id={"toolbar-" + this.props.id}>
+                <select className="ql-header" onChange={e => e.persist()}>
+                    <option value="">Normal</option>
+                    <option value="1">Heading 1</option>
+                    <option value="2">Heading 2</option>
+                    <option value="3">Heading 3</option>
+                </select>
+                <button className="ql-bold" />
+                <button className="ql-italic" />
+                <button className="ql-underline" />
+                <button className="ql-link" />
+                <button className="ql-underline" />
+                <button className="ql-list" value="ordered" />
+                <button className="ql-list" value="bullet" />
+                <button className="ql-clean" />
+                <div>
+                    <label style={{float: "left", margin: "0 5px"}}>C: </label>
+                    <select className="ql-consonant" defaultValue="...">
+                        {consonants.map((symbol: string, key: number) => {
+                            return (
+                                <option
+                                    key={"symbol-" + key}
+                                    value={symbol}
+                                >{symbol}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+                <div>
+                    <label style={{float: "left", margin: "0 5px"}}>V: </label>
+                    <select className="ql-vowel" defaultValue="...">
+                        {vowels.map((symbol: string, key: number) => {
+                            return (
+                                <option
+                                    key={"symbol-" + key}
+                                    value={symbol}
+                                >{symbol}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+                <div>
+                    <label style={{float: "left", margin: "0 5px"}}>S: </label>
+                    <select className="ql-symbol" defaultValue="...">
+                        {symbols.map((symbol: string, key: number) => {
+                            return (
+                                <option
+                                    key={"symbol-" + key}
+                                    value={symbol}
+                                >{symbol}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+            </div>
+        );
+    }
+
     render() {
         if (!this.props.id) return;
 
@@ -71,20 +152,31 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                             textTransform: 'capitalize',
                         }}
                     >{this.props.id}</InputLabel>
-                    <BodyEditor
-                        id={this.props.id}
-                        className="heruvia-text"
-                        value={this.props.value}
-                        onChange={(content) => { this.props.onChange(this.props.id, content) }}
-                        onFocus={() => { this.props.onFocus(this.props.id) }}
-                        onBlur={() => { this.props.onBlur() }}
-                        formats={this.props.formats}
-                        modules={{
-                            clipboard: {
-                                matchVisual: false,
-                            }
-                        }}
-                    />
+                    <div className={"text-editor-" + this.props.id}>
+                        {this.getToolbar()}
+                        <ReactQuill
+                            id={this.props.id}
+                            className="heruvia-text"
+                            value={this.props.value}
+                            onChange={(content) => { this.props.onChange(this.props.id, content) }}
+                            onFocus={() => { this.props.onFocus(this.props.id) }}
+                            onBlur={() => { this.props.onBlur() }}
+                            formats={this.props.formats}
+                            modules={{
+                                toolbar: {
+                                    container: "#toolbar-" + this.props.id,
+                                    handlers: {
+                                        symbol: insertSymbol,
+                                        consonant: insertSymbol,
+                                        vowel: insertSymbol,
+                                    },
+                                },
+                                clipboard: {
+                                    matchVisual: false,
+                                }
+                            }}
+                        />
+                    </div>
                 </FormControl>
                 <div style={{ clear: 'both' }} />
             </div>
