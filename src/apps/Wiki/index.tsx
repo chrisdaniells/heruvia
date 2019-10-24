@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { normalizeString } from "@lib/normalize";
+
 import { SearchApiClient, WikiApiClient, IDefaultResponse } from '@api';
 import config from '@config';
 
@@ -62,6 +64,13 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
         let pages = [ ...this.state.pages ];
 
         switch(filter) {
+            case PageListFilters.All:
+                pages.sort((a: any, b: any) => {
+                        if (normalizeString(a.title) > normalizeString(b.title)) return +1;
+                        else if (normalizeString(a.title) < normalizeString(b.title)) return -1;
+                        else return 0;  
+                    });
+                break;
             case PageListFilters.RecentlyModified:
                     pages.sort((a: any, b: any) => {
                         if (a.last_updated > b.last_updated) return -1;

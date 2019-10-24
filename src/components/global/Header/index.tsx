@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 
+import { normalizeString } from "@lib/normalize";
+
 import config from '@config';
 import { DataSources } from '@enums';
 
@@ -61,7 +63,7 @@ class Header extends React.Component<any, IHeaderState> {
         this.props.SearchApiClient.setSource(
             WikiSourceConfig.name, 
             WikiSourceConfig.files,
-            WikiSourceConfig.target, 
+            WikiSourceConfig.target,
             WikiSourceConfig.props,
         );
     }
@@ -86,7 +88,7 @@ class Header extends React.Component<any, IHeaderState> {
 
     handleSearchInput(e: any): void {
         clearTimeout(this.searchTimer);
-        const searchTerm = e.currentTarget.value;
+        const searchTerm = normalizeString(e.currentTarget.value);
 
         this.searchTimer = setTimeout(() => {
             const searchResults = searchTerm.length >= 2 ?

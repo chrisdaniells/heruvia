@@ -1,4 +1,4 @@
-import FuzzySearch from 'fuzzy-search';
+import FuzzySearch from '@lib/fuzzySearch';
 
 import { DataSources } from '@enums';
 
@@ -17,7 +17,7 @@ interface IResult {
 }
 
 class SearchApiClient {
-    private searchers: { [key: string] : FuzzySearch<any> } = {};
+    private searchers: { [key: string] : FuzzySearch } = {};
 
     public sources: ISource[] = [];
 

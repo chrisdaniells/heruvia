@@ -17,6 +17,7 @@
       "@config": ["config/index"],
       "@enums": ["enums/index"],
       "@interfaces": ["interfaces/index"],
+      "@lib/*": ["lib/*"],
       "@root/*": ["./*"],
       //"@language/*": ["apps/Languages/generators/*"]
     }

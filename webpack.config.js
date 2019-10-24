@@ -37,6 +37,7 @@ module.exports = {
             "@config": path.join(__dirname, './src/config'),
             "@enums": path.join(__dirname, './src/enums'),
             "@interfaces": path.join(__dirname, './src/interfaces'),
+            "@lib": path.join(__dirname, './src/lib'),
             //"@language": path.join(__dirname, './src/apps/Languages/generators'),
         },
     },
