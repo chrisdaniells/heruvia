@@ -107,12 +107,19 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
                         onChange={this.handlePageTabChange}
                         aria-label='disabled tabs example'
                     >
+                        <Tab label={PageListFilters.All + ' (' + this.state.pages.length + ')'} style={tabStyles} />
                         <Tab label={PageListFilters.RecentlyModified} style={tabStyles} />
                         <Tab label={PageListFilters.RecentlyCreated} style={tabStyles} />
-                        <Tab label={PageListFilters.All + ' (' + this.state.pages.length + ')'} style={tabStyles} />
+                        
                     </Tabs>
                         <DisplayWrap 
                             show={this.state.selectedPagesTab === 0}
+                            style={paperStyles}
+                        >
+                            <PageList pages={this.filterPages(PageListFilters.All)} edit={true} />
+                        </DisplayWrap>
+                        <DisplayWrap 
+                            show={this.state.selectedPagesTab === 1}
                             style={paperStyles}
                         >
                             <PageList 
@@ -121,19 +128,13 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
                             />
                         </DisplayWrap>
                         <DisplayWrap 
-                            show={this.state.selectedPagesTab === 1}
+                            show={this.state.selectedPagesTab === 2}
                             style={paperStyles}
                         >
                             <PageList 
                                 pages={this.filterPages(PageListFilters.RecentlyCreated, 5)}
                                 edit={true}
                             />
-                        </DisplayWrap>
-                        <DisplayWrap 
-                            show={this.state.selectedPagesTab === 2}
-                            style={paperStyles}
-                        >
-                            <PageList pages={this.filterPages(PageListFilters.All)} edit={true} />
                         </DisplayWrap>
                 </Paper>
 

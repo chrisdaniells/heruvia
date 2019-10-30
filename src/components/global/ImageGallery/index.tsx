@@ -103,12 +103,12 @@ export default class ImageGallery extends React.Component<any, any> {
                     onClose={this.handleClose}
                     fullScreen
                 >
-                    <DialogContent>
+                    <DialogContent style={{ textAlign: 'center' }}>
                         <img 
                             src={config.paths.images + this.state.selectedImage}
                             style={{
-                                width: '100%',
-                                height: 'auto',
+                                maxWidth: '100%',
+                                maxHeight: '100%',
                             }}
                         />
                     </DialogContent>

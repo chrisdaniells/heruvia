@@ -280,18 +280,22 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                     </Link>
                                 </Breadcrumbs>
 
-                                <div>
-                                    {page.images.main.length > 0 &&
+                                {page.images.main.length > 0 &&
+                                    <div style={{
+                                        backgroundColor: "#f1f1f1",
+                                        textAlign: "center",
+                                        marginBottom: config.styles.spacing.default
+                                    }}>
                                         <img
                                             src={config.paths.images + '/' + page.images.main} id='main-image'
                                             className='wikipage-main-image'
                                             style={{
-                                                width: '100%',
-                                                marginBottom: config.styles.spacing.default
+                                                maxWidth: '100%',
+                                                maxHeight: 500,
                                             }}
                                         />
-                                    }
-                                </div>
+                                    </div>
+                                }
 
                                 <Grid
                                     container
