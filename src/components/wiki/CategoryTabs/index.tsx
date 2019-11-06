@@ -14,7 +14,8 @@ import SubcategoryItem from '@components/wiki/SubcategoryItem';
 import DisplayWrap from '@components/global/DisplayWrap';
 
 interface ICategoryTabsProps {
-
+    preSelected?: number,
+    location?: string,
 }
 
 interface ICategoryTabsState {
@@ -31,7 +32,7 @@ export default class CategoryTabs extends React.Component<ICategoryTabsProps, IC
         super(props, state);
 
         this.state = {
-            selectedCategoryTab: 0,
+            selectedCategoryTab: this.props.preSelected !== undefined ? this.props.preSelected : 0,
         };
 
         this.handleCategoryTabChange = this.handleCategoryTabChange.bind(this);
@@ -50,7 +51,8 @@ export default class CategoryTabs extends React.Component<ICategoryTabsProps, IC
                     <SubcategoryItem
                         key={subcategory}
                         category={category}
-                        subcategory={subcategory} 
+                        subcategory={subcategory}
+                        location={this.props.location}
                     />
                 );
             });

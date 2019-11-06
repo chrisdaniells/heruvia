@@ -1,2 +1,1 @@
-export * from './Category';
-export * from './Page';
+export * from './wiki/Page';

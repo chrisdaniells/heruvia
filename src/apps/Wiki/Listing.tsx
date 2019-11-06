@@ -43,6 +43,7 @@ export default class Listing extends React.Component<IListingProps, IListingStat
 
         this.fetchPages = this.fetchPages.bind(this);
         this.resetAlert = this.resetAlert.bind(this);
+        this.renderCategoryListing = this.renderCategoryListing.bind(this);
 
         this.state = {
             pages: [],
@@ -95,7 +96,22 @@ export default class Listing extends React.Component<IListingProps, IListingStat
         });
     }
 
+    renderCategoryListing() {
+        if (this.props.match.params.attribute === "subcategory") {
+            const category = Object.keys(config.wiki.categories).find((key: string) => {
+                if (config.wiki.categories[key].includes(this.props.match.params.value)) {
+                    return true;
+                }
+                return false;
+            });
+
+            const preSelected = Object.keys(config.wiki.categories).indexOf(category);
+            return <CategoryTabs preSelected={preSelected !== -1 ? preSelected : 0} location={this.props.location.pathname} />;
+        }
+   }
+
     render() {
+        console.log(this.props);
         return(
             <div style={{ ...config.styles.container, marginTop: 100 }}>
                 <Card square style={{ marginBottom: config.styles.spacing.default }}>
@@ -124,10 +140,7 @@ export default class Listing extends React.Component<IListingProps, IListingStat
                         />
                     </CardContent>
             </Card>
-                {(this.props.match.params.attribute === "category" ||
-                    this.props.match.params.attribute === "subcategory") &&
-                    <CategoryTabs />
-                }
+                {this.renderCategoryListing()}
             </div>
         );
     }

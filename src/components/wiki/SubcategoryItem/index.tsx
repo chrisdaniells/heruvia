@@ -12,6 +12,7 @@ import {
 interface ICategoryItemProps {
     subcategory: SubCategories;
     category: Categories;
+    location: string;
 }
 
 
@@ -31,12 +32,14 @@ export default class SubcategoryItem extends React.Component<ICategoryItemProps,
     }
 
     render() {
+        const link = "/wiki/list/subcategory/" + this.props.subcategory;
         return (
             <ListItem
                 button 
                 style={{ textTransform: "capitalize" }}
                 component={Link}
-                to={"/wiki/list/subcategory/" + this.props.subcategory}
+                to={link}
+                selected={link === this.props.location}
             >
                 {this.renderIcon()}
                 <ListItemText primary={this.props.subcategory} />
