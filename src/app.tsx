@@ -13,8 +13,6 @@ import WikiPage from '@apps/wiki/Page';
 import WikiEdit from '@apps/Wiki/Edit';
 import WikiListing from '@apps/Wiki/Listing';
 import WikiPrint from '@apps/Wiki/Print';
-import LanguagesApp from '@apps/Languages';
-import NotesApp from '@apps/Notes';
 import TimelineApp from '@apps/Timeline';
 
 import ScrollToTop from '@components/global/ScrollToTop';
@@ -37,9 +35,7 @@ ReactDOM.render((
                     SearchApiClient={searchApiClient}
                 />
                 <Switch>
-                    <Route path='/notes' component={NotesApp} />
                     <Route path='/timeline' component={TimelineApp} />
-                    <Route path='/languages' component={LanguagesApp} />
 
                     <Route
                         path='/wiki/list/:attribute/:value'

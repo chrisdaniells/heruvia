@@ -182,17 +182,6 @@ class Header extends React.Component<any, IHeaderState> {
                         <ListItem
                             button
                             component={Link}
-                            to='/languages'
-                            onClick={this.toggleDrawer}
-                        >
-                            <ListItemIcon>
-                                <ChatIcon />
-                            </ListItemIcon>
-                            <ListItemText primary='Languages' />
-                        </ListItem>
-                        <ListItem
-                            button
-                            component={Link}
                             to='/timeline'
                             onClick={this.toggleDrawer}
                         >
@@ -204,13 +193,13 @@ class Header extends React.Component<any, IHeaderState> {
                         <ListItem
                             button
                             component={Link}
-                            to='/notes'
+                            to='/languages'
                             onClick={this.toggleDrawer}
                         >
                             <ListItemIcon>
-                                <BookIcon />
+                                <ChatIcon />
                             </ListItemIcon>
-                            <ListItemText primary='Notes' />
+                            <ListItemText primary='Languages' />
                         </ListItem>
                     </List>
                 </Drawer>

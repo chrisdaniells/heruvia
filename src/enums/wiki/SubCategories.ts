@@ -5,7 +5,7 @@ import {
     Fingerprint, Functions, DeviceHub, AccountBalance, Domain, 
     Texture, Restaurant, VpnKey, Stars, Colorize, Android,
     Pets, LocalFlorist, LocationCity, Landscape, Place,
-    Map as MapIcon, Waves, Visibility, Build, Loop, BrightnessLow,
+    Map as MapIcon, Waves, Visibility, Loop, BrightnessLow,
     PanTool, Palette, Info,
 } from '@material-ui/icons';
 
@@ -34,7 +34,6 @@ enum SubCategories {
     Regions = 'regions',
     WaterBodies = 'water bodies',
     TheAgeOfAwakening = 'the age of awakening',
-    TheAgeOfBeginnings = 'the age of beginnings',
     TheAgeOfUncertainty = 'the age of uncertainty',
     TheAgeOfEmpires = 'the age of empires',
     TheAgeOfRaces = 'the age of races',
@@ -67,7 +66,6 @@ const SubCategoryIcons: { [key: string ]: any } = {
     Regions: MapIcon,
     WaterBodies: Waves,
     TheAgeOfAwakening: Visibility,
-    TheAgeOfBeginnings: Build,
     TheAgeOfUncertainty: Loop,
     TheAgeOfEmpires: BrightnessLow,
     TheAgeOfRaces: PanTool,

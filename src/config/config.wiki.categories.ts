@@ -34,7 +34,6 @@ const CategoryConfig = {
     ],
     [Categories.History]: [
         SubCategories.TheAgeOfAwakening,
-        SubCategories.TheAgeOfBeginnings,
         SubCategories.TheAgeOfUncertainty,
         SubCategories.TheAgeOfEmpires,
         SubCategories.TheAgeOfRaces,

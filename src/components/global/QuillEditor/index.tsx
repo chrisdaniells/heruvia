@@ -8,12 +8,10 @@ import config from '@config';
 interface IQuillEditorProps {
     id: string;
     formStyles?: { [key: string] : string };
-    isFocused: boolean;
+    isFocused?: boolean;
     value: string;
-    formats: string[];
+    toolbar?: string;
     onChange(id: string, content: string): any;
-    onFocus(id: string): any;
-    onBlur(): any;
 }
 
 function insertSymbol(symbol: string) {
@@ -62,7 +60,6 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                     empty: true,
                     collapsed: true,
                     handler: function(range, context) {
-                        console.log(context);
                         this.quill.format('list', false, 'user');
                         if (context.format.indent) {
                           this.quill.format('indent', false, 'user');
@@ -101,23 +98,46 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
     }
 
     getToolbar() {
+        switch (this.props.toolbar) {
+            case "inline":
+                return (
+                    <div id={"toolbar-" + this.props.id}>
+                        <button className="ql-bold" />
+                        <button className="ql-italic" />
+                        <button className="ql-underline" />
+                        <button className="ql-link" />
+                        <button className="ql-underline" />
+                        <button className="ql-clean" />
+                        {this.getSymbolSelects()}
+                    </div>
+                );
+            default:
+                return (
+                    <div id={"toolbar-" + this.props.id}>
+                        <select className="ql-header" onChange={e => e.persist()}>
+                            <option value="">Normal</option>
+                            <option value="1">Heading 1</option>
+                            <option value="2">Heading 2</option>
+                            <option value="3">Heading 3</option>
+                        </select>
+                        <button className="ql-bold" />
+                        <button className="ql-italic" />
+                        <button className="ql-underline" />
+                        <button className="ql-link" />
+                        <button className="ql-underline" />
+                        <button className="ql-list" value="ordered" />
+                        <button className="ql-list" value="bullet" />
+                        <button className="ql-clean" />
+                        <button className="ql-timeline" ><strong>TL</strong></button>
+                        {this.getSymbolSelects()}
+                    </div>
+                );
+        }
+    }
+
+    getSymbolSelects() {
         return (
-            <div id={"toolbar-" + this.props.id}>
-                <select className="ql-header" onChange={e => e.persist()}>
-                    <option value="">Normal</option>
-                    <option value="1">Heading 1</option>
-                    <option value="2">Heading 2</option>
-                    <option value="3">Heading 3</option>
-                </select>
-                <button className="ql-bold" />
-                <button className="ql-italic" />
-                <button className="ql-underline" />
-                <button className="ql-link" />
-                <button className="ql-underline" />
-                <button className="ql-list" value="ordered" />
-                <button className="ql-list" value="bullet" />
-                <button className="ql-clean" />
-                <button className="ql-timeline" ><strong>TL</strong></button>
+            <div>
                 <div>
                     <label style={{float: "left", margin: "0 5px"}}>C: </label>
                     <select className="ql-consonant" defaultValue="...">
@@ -191,12 +211,9 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                         {this.getToolbar()}
                         <ReactQuill
                             id={this.props.id}
-                            className="heruvia-text"
+                            className={"heruvia-text" + this.props.toolbar ? " type-" + this.props.toolbar : ""}
                             value={this.props.value}
-                            onChange={(content) => { console.log("change"); this.props.onChange(this.props.id, content) }}
-                            //onFocus={() => { console.log("focus"); this.props.onFocus(this.props.id) }}
-                            //onBlur={() => { console.log("blur"); this.props.onBlur() }}
-                            formats={this.props.formats}
+                            onChange={(content) => { this.props.onChange(this.props.id, content) }}
                             modules={this.modules}
                         />
                     </div>

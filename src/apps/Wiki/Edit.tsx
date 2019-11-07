@@ -35,7 +35,6 @@ interface IEditProps {
 
 interface IEditState {
     page: IPage | null;
-    quillFocus: string | null;
     alert: IAlertProps
 }
 
@@ -84,12 +83,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
 
         this.state = {
             page,
-            quillFocus: null,
             alert,
         };
 
         this.resetAlert = this.resetAlert.bind(this);
-        this.handleQuillFocus = this.handleQuillFocus.bind(this);
         this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.handleDetailsFormChange = this.handleDetailsFormChange.bind(this);
@@ -130,10 +127,6 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 }));
             }, 100);
         });
-    }
-
-    handleQuillFocus(editor: string | null = null) {
-        this.setState((state: any) => ({ quillFocus: state.quillFocus !== editor ? editor : null }));
     }
 
     handleKeyDown(e: any) {
@@ -451,17 +444,14 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     renderFormQuill(editor: string, formats?: string[]) {
-        const isFocused = this.state.quillFocus === editor || this.state.page[editor as string].length !== 0;
+        const isFocused = this.state.page[editor as string].length !== 0;
         return (
             <QuillEditor
                 id={editor}
                 value={this.state.page[editor]}
                 formStyles={inputStyle}
                 isFocused={isFocused}
-                formats={formats !== undefined ? formats : undefined}
                 onChange={this.handleQuillFormChange}
-                onFocus={this.handleQuillFocus}
-                onBlur={this.handleQuillFocus}
             />
         );
     }

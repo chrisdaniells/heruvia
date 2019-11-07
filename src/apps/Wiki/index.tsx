@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { normalizeString } from "@lib/normalize";
 
@@ -7,12 +6,10 @@ import { SearchApiClient, WikiApiClient, IDefaultResponse } from '@api';
 import config from '@config';
 
 import {
-    Button,
     Paper,
     Tab,
     Tabs,
 } from '@material-ui/core';
-import { AddCircleOutline as AddIcon } from '@material-ui/icons';
 import { PageListFilters } from '@apps/Wiki/enums';
 
 import DisplayWrap from '@components/global/DisplayWrap';

@@ -8,7 +8,7 @@ const PATHS = {
 };
 
 module.exports = {
-    devtool: 'source-map',
+    devtool: 'inline-source-map',
     context: path.join(__dirname, '/src'),
     entry: PATHS.app,
     output: {
