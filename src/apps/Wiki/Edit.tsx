@@ -484,10 +484,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         {this.renderFormTitle()}
                         {this.renderFormCategorySubcategory()}
                         {this.renderFormDetails()}
-                        {this.renderFormQuill(
-                            'preface',
-                            ['bold', 'italic', 'underline', 'strike', 'blockquote', 'indent', 'link', 'image']
-                        )}
+                        {this.renderFormQuill('preface')}
                         {this.renderFormQuill('body')}
                         {this.renderFormOtherImages()}
                     </CardContent>

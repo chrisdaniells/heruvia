@@ -145,6 +145,23 @@ a:hover {
     max-width: 100%;
 }
 
+.heruvia-timeline {
+    border: 1px solid #d2d2d2;
+    padding: 5px !important;
+}
+.heruvia-timeline li {
+    padding: 10px;
+}
+.heruvia-timeline li::before {
+    display: none !important;
+}
+.heruvia-timeline li:nth-of-type(odd) {
+    background: #f1f1f1;
+}
+.heruvia-timeline li:nth-of-type(even) {
+
+}
+
 #Print.heruvia-text {
     font-size: 13px;
 }

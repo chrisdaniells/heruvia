@@ -42,6 +42,37 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
         this.getToolbar = this.getToolbar.bind(this);
     }
 
+    modules = {
+        toolbar: {
+            container: "#toolbar-" + this.props.id,
+            handlers: {
+                symbol: insertSymbol,
+                consonant: insertSymbol,
+                vowel: insertSymbol,
+            },
+        },
+        clipboard: {
+            matchVisual: false,
+        },
+        keyboard: {
+            bindings: {
+                timelineEnter: {
+                    key: 13,
+                    format: ['timeline'],
+                    empty: true,
+                    collapsed: true,
+                    handler: function(range, context) {
+                        console.log(context);
+                        this.quill.format('list', false, 'user');
+                        if (context.format.indent) {
+                          this.quill.format('indent', false, 'user');
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     componentDidMount() {
         this.sanitizeQuill();
     }
@@ -57,13 +88,16 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                 }
                 return node;
             }
-
             static sanitize(url: string) {
                 return sanitizeLink(url);
             }
         };
+        Quill.register(QuillLink, true);
 
-        Quill.register(QuillLink);
+        class Timeline extends Quill.import('formats/list') { };
+        Timeline.blotName = 'timeline';
+        Timeline.className = 'heruvia-timeline';
+        Quill.register({ 'formats/timeline': Timeline }, true);
     }
 
     getToolbar() {
@@ -83,6 +117,7 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                 <button className="ql-list" value="ordered" />
                 <button className="ql-list" value="bullet" />
                 <button className="ql-clean" />
+                <button className="ql-timeline" ><strong>TL</strong></button>
                 <div>
                     <label style={{float: "left", margin: "0 5px"}}>C: </label>
                     <select className="ql-consonant" defaultValue="...">
@@ -158,23 +193,11 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                             id={this.props.id}
                             className="heruvia-text"
                             value={this.props.value}
-                            onChange={(content) => { this.props.onChange(this.props.id, content) }}
-                            onFocus={() => { this.props.onFocus(this.props.id) }}
-                            onBlur={() => { this.props.onBlur() }}
+                            onChange={(content) => { console.log("change"); this.props.onChange(this.props.id, content) }}
+                            //onFocus={() => { console.log("focus"); this.props.onFocus(this.props.id) }}
+                            //onBlur={() => { console.log("blur"); this.props.onBlur() }}
                             formats={this.props.formats}
-                            modules={{
-                                toolbar: {
-                                    container: "#toolbar-" + this.props.id,
-                                    handlers: {
-                                        symbol: insertSymbol,
-                                        consonant: insertSymbol,
-                                        vowel: insertSymbol,
-                                    },
-                                },
-                                clipboard: {
-                                    matchVisual: false,
-                                }
-                            }}
+                            modules={this.modules}
                         />
                     </div>
                 </FormControl>
