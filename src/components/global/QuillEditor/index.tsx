@@ -11,6 +11,7 @@ interface IQuillEditorProps {
     isFocused?: boolean;
     value: string;
     toolbar?: string;
+    placeholder?: string;
     onChange(id: string, content: string): any;
 }
 
@@ -22,13 +23,13 @@ function insertSymbol(symbol: string) {
 }
 
 const consonants = [
-    "Đ", "ð", "Ç", "ç", "Ћ", "þ", "Ş", "ş",
+    'Đ', 'ð', 'Ç', 'ç', 'Ћ', 'þ', 'Ş', 'ş',
 ];
 const vowels = [
-    "Ä", "ä", "Ã", "ã", "ë", "Ẽ", "ẽ", "Ï", "ï", "Ĩ", "ĩ", "Ö", "ö", "Õ", "õ", "Ü", "ü", "Ũ", "ũ",
+    'Ä', 'ä', 'Ã', 'ã', 'ë', 'Ẽ', 'ẽ', 'Ï', 'ï', 'Ĩ', 'ĩ', 'Ö', 'ö', 'Õ', 'õ', 'Ü', 'ü', 'Ũ', 'ũ',
 ];
 const symbols = [
-    "♀", "♂", "»", "П", "Ń", "И", "Џ", "Ŋ", "Ф", "Ө", "Ø",
+    '♀', '♂', '»', 'П', 'Ń', 'И', 'Џ', 'Ŋ', 'Ф', 'Ө', 'Ø',
 ];
 
 export default class QuillEditor extends React.Component<IQuillEditorProps, any> {
@@ -42,7 +43,7 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
 
     modules = {
         toolbar: {
-            container: "#toolbar-" + this.props.id,
+            container: '#toolbar-' + this.props.id,
             handlers: {
                 symbol: insertSymbol,
                 consonant: insertSymbol,
@@ -99,36 +100,36 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
 
     getToolbar() {
         switch (this.props.toolbar) {
-            case "inline":
+            case 'inline':
                 return (
-                    <div id={"toolbar-" + this.props.id}>
-                        <button className="ql-bold" />
-                        <button className="ql-italic" />
-                        <button className="ql-underline" />
-                        <button className="ql-link" />
-                        <button className="ql-underline" />
-                        <button className="ql-clean" />
+                    <div id={'toolbar-' + this.props.id}>
+                        <button className='ql-bold' />
+                        <button className='ql-italic' />
+                        <button className='ql-underline' />
+                        <button className='ql-link' />
+                        <button className='ql-underline' />
+                        <button className='ql-clean' />
                         {this.getSymbolSelects()}
                     </div>
                 );
             default:
                 return (
-                    <div id={"toolbar-" + this.props.id}>
-                        <select className="ql-header" onChange={e => e.persist()}>
-                            <option value="">Normal</option>
-                            <option value="1">Heading 1</option>
-                            <option value="2">Heading 2</option>
-                            <option value="3">Heading 3</option>
+                    <div id={'toolbar-' + this.props.id}>
+                        <select className='ql-header' onChange={e => e.persist()}>
+                            <option value=''>Normal</option>
+                            <option value='1'>Heading 1</option>
+                            <option value='2'>Heading 2</option>
+                            <option value='3'>Heading 3</option>
                         </select>
-                        <button className="ql-bold" />
-                        <button className="ql-italic" />
-                        <button className="ql-underline" />
-                        <button className="ql-link" />
-                        <button className="ql-underline" />
-                        <button className="ql-list" value="ordered" />
-                        <button className="ql-list" value="bullet" />
-                        <button className="ql-clean" />
-                        <button className="ql-timeline" ><strong>TL</strong></button>
+                        <button className='ql-bold' />
+                        <button className='ql-italic' />
+                        <button className='ql-underline' />
+                        <button className='ql-link' />
+                        <button className='ql-underline' />
+                        <button className='ql-list' value='ordered' />
+                        <button className='ql-list' value='bullet' />
+                        <button className='ql-clean' />
+                        <button className='ql-timeline' ><strong>TL</strong></button>
                         {this.getSymbolSelects()}
                     </div>
                 );
@@ -139,44 +140,26 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
         return (
             <div>
                 <div>
-                    <label style={{float: "left", margin: "0 5px"}}>C: </label>
-                    <select className="ql-consonant" defaultValue="...">
+                    <label style={{float: 'left', margin: '0 5px'}}>C: </label>
+                    <select className='ql-consonant' defaultValue='...'>
                         {consonants.map((symbol: string, key: number) => {
-                            return (
-                                <option
-                                    key={"symbol-" + key}
-                                    value={symbol}
-                                >{symbol}
-                                </option>
-                            );
+                            return <option key={'symbol-' + key} value={symbol}>{symbol}</option>;
                         })}
                     </select>
                 </div>
                 <div>
-                    <label style={{float: "left", margin: "0 5px"}}>V: </label>
-                    <select className="ql-vowel" defaultValue="...">
+                    <label style={{float: 'left', margin: '0 5px'}}>V: </label>
+                    <select className='ql-vowel' defaultValue='...'>
                         {vowels.map((symbol: string, key: number) => {
-                            return (
-                                <option
-                                    key={"symbol-" + key}
-                                    value={symbol}
-                                >{symbol}
-                                </option>
-                            );
+                            return <option key={'symbol-' + key} value={symbol}>{symbol}</option>;
                         })}
                     </select>
                 </div>
                 <div>
-                    <label style={{float: "left", margin: "0 5px"}}>S: </label>
-                    <select className="ql-symbol" defaultValue="...">
+                    <label style={{float: 'left', margin: '0 5px'}}>S: </label>
+                    <select className='ql-symbol' defaultValue='...'>
                         {symbols.map((symbol: string, key: number) => {
-                            return (
-                                <option
-                                    key={"symbol-" + key}
-                                    value={symbol}
-                                >{symbol}
-                                </option>
-                            );
+                            return <option key={'symbol-' + key} value={symbol}>{symbol}</option>;
                         })}
                     </select>
                 </div>
@@ -206,12 +189,12 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                             top: this.props.isFocused ? '0' : '46px',
                             textTransform: 'capitalize',
                         }}
-                    >{this.props.id}</InputLabel>
-                    <div className={"text-editor-" + this.props.id}>
+                    >{this.props.placeholder}</InputLabel>
+                    <div className={'text-editor-' + this.props.id}>
                         {this.getToolbar()}
                         <ReactQuill
                             id={this.props.id}
-                            className={"heruvia-text" + this.props.toolbar ? " type-" + this.props.toolbar : ""}
+                            className={'heruvia-text' + this.props.toolbar ? ' type-' + this.props.toolbar : ''}
                             value={this.props.value}
                             onChange={(content) => { this.props.onChange(this.props.id, content) }}
                             modules={this.modules}

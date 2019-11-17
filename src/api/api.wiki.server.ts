@@ -5,7 +5,7 @@ import { ApiServer } from '@api';
 
 import config from '@config';
 
-import { IDefaultResponse } from './api.interfaces';
+import { IDefaultResponse } from '@interfaces';
 import { IPage } from '@interfaces';
 
 class WikiApiServer extends ApiServer {

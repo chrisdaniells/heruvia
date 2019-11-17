@@ -38,15 +38,15 @@ export default class Alert extends React.Component<IAlertProps, IAlertState> {
             <Dialog
                 open={this.props.open}
                 onClose={this.props.close.onClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
+                aria-labelledby='alert-dialog-title'
+                aria-describedby='alert-dialog-description'
             >
                 {this.props.title.length > 0 &&
-                    <DialogTitle id="alert-dialog-title">{this.props.title}</DialogTitle>
+                    <DialogTitle id='alert-dialog-title'>{this.props.title}</DialogTitle>
                 }
                 {this.props.message.length > 0 &&
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                        <DialogContentText id='alert-dialog-description'>
                             {this.props.message}
                         </DialogContentText>
                     </DialogContent>
@@ -57,7 +57,7 @@ export default class Alert extends React.Component<IAlertProps, IAlertState> {
                         {this.props.confirm.label}
                     </Button>
                 }
-                <Button onClick={this.props.close.onClose} color="primary">
+                <Button onClick={this.props.close.onClose} color='primary'>
                     {this.props.close.label}
                 </Button>
                 </DialogActions>

@@ -74,7 +74,7 @@ export default class Listing extends React.Component<IListingProps, IListingStat
             message: 'A list for ' + params.attribute + ' : ' + params.value + ' could not been found.',
             close: {
                 onClose: this.resetAlert,
-                label: "OK",
+                label: 'OK',
             },
             confirm: false,
         } : alert;
@@ -86,22 +86,16 @@ export default class Listing extends React.Component<IListingProps, IListingStat
     }
 
     resetAlert(): void {
-        this.setState (state => ({
-            alert: { ...state.alert, open: false }
-        }),() => {
+        this.setState (state => ({ alert: { ...state.alert, open: false } }), () => {
             // Otherwise text disappears before dialog closes
-            setTimeout(() => {
-                this.props.history.goBack();
-            }, 50);
+            setTimeout(() => { this.props.history.goBack() }, 50);
         });
     }
 
     renderCategoryListing() {
-        if (this.props.match.params.attribute === "subcategory") {
+        if (this.props.match.params.attribute === 'subcategory') {
             const category = Object.keys(config.wiki.categories).find((key: string) => {
-                if (config.wiki.categories[key].includes(this.props.match.params.value)) {
-                    return true;
-                }
+                if (config.wiki.categories[key].includes(this.props.match.params.value)) return true;
                 return false;
             });
 
@@ -111,7 +105,6 @@ export default class Listing extends React.Component<IListingProps, IListingStat
    }
 
     render() {
-        console.log(this.props);
         return(
             <div style={{ ...config.styles.container, marginTop: 100 }}>
                 <Card square style={{ marginBottom: config.styles.spacing.default }}>

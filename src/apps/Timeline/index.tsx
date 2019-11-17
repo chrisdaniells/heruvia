@@ -1,34 +1,42 @@
 import React from 'react';
-import ChipInput from 'material-ui-chip-input'
+import ReactHtmlParser from 'react-html-parser';
 
-import * as hcal from '@lib/hcal';
+import { SearchApiClient, WikiApiClient, TimelineApiClient } from '@api';
+
+import _ from '@lib/herulib';
+import config from '@config';
 
 import QuillEditor from '@components/global/QuillEditor';
+import Alert, { IAlertProps } from '@components/global/Alert';
 
 import {
     Button,
+    Chip,
     Card, CardContent, CardHeader,
     Divider,
     ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
     FormControl,
     IconButton,
     Input, InputLabel,
-    List, ListItem, ListItemSecondaryAction, ListItemText,
+    List, ListItem, ListItemText,
+    TextField,
     Typography
 } from '@material-ui/core';
+import { Autocomplete } from '@material-ui/lab';
 import {
-    Edit as EditIcon,
+    Cancel as CancelIcon,
+    Delete as DeleteIcon,
     ExpandMore as ExpandMoreIcon,
     Save as SaveIcon,
 } from '@material-ui/icons';
 
-import config from '@config';
-
-import { IEntry } from '@interfaces';
+import { IEntry, IPage } from '@interfaces';
 import { SubCategories, AgeChar } from '@enums';
 
 interface ITimelineAppProps {
-
+    SearchApiClient: SearchApiClient;
+    WikiApiClient: WikiApiClient;
+    TimelineApiClient: TimelineApiClient;
 }
 
 interface ITimelineAppState {
@@ -36,11 +44,11 @@ interface ITimelineAppState {
     currentEntry: IEntry;
     editEntry?: IEntry;
     quillFocus?: string | null;
+    tags: any;
+    alert: IAlertProps
 }
 
-const inputStyle = {
-    marginBottom: config.styles.spacing.default
-}
+const inputStyle = { marginBottom: config.styles.spacing.default };
 
 export default class TimelineApp extends React.Component<ITimelineAppProps, ITimelineAppState> {
 
@@ -48,64 +56,56 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
         super(props, state);
 
         this.state = {
-            entries: [
-                {
-                    id: 1,
-                    date: "U4-35-X",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                },
-                {
-                    id: 2,
-                    date: "C4-35-10",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                },
-                {
-                    id: 3,
-                    date: "C4-35-X",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                },
-                {
-                    id: 4,
-                    date: "E4-35-X",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                },
-                {
-                    id: 5,
-                    date: "R4-35-X",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                },
-                {
-                    id: 6,
-                    date: "R4-35-X",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                },
-                {
-                    id: 7,
-                    date: "U4-35-X",
-                    body: "Some text here",
-                    tags: ["Me", "You", "Everybody"],
-                }
-
-            ],
-            currentEntry: {
-                id: 0,
-                date: "",
-                body: "",
-                tags: [],
-            }
+            entries: this.props.TimelineApiClient.getTimeline().data,
+            currentEntry: { ...config.timeline.entry.blankEntry },
+            tags: this.props.WikiApiClient.getAllPages().data.map((page: IPage) => {
+                return {
+                    title: page.title,
+                    normalized: _.lang.normalizeString(page.title),
+                };
+            }),
+            alert: { ...config.alert.blankAlert },
         };
 
         this.handleFormChange = this.handleFormChange.bind(this);
         this.handleQuillFormChange = this.handleQuillFormChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
+        this.onSave = this.onSave.bind(this);
         this.renderEditForm = this.renderEditForm.bind(this);
         this.renderTimelineList = this.renderTimelineList.bind(this);
+        this.resetAlert = this.resetAlert.bind(this);
+        this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
+    }
+
+    resetAlert(): void {
+        this.setState (state => ({ alert: { ...state.alert, open: false }}),() => {
+            // Otherwise text disappears before dialog closes
+            setTimeout(() => {
+                this.setState(state => ({
+                    alert: { ...config.alert.blankAlert }
+                }));
+            }, 100);
+        });
+    }
+
+    handleDeleteConfirm(id: number) {
+        this.props.TimelineApiClient.deleteEntry(id);
+        this.setState({
+            entries: this.props.TimelineApiClient.getTimeline().data,
+            alert: { ...config.alert.blankAlert }
+        });
+    }
+
+    // TODO Convert to generc set modal function
+    onDelete(id: number) {
+        this.setState({
+            alert: {
+                open: true,
+                title: 'Delete Entry',
+                message: 'Are you sure you want to delete this entry?',
+                close: { onClose: this.resetAlert, label: 'Cancel' },
+                confirm: { onConfirm: () => this.handleDeleteConfirm(id), label: 'Yes' }
+            }
+        });
     }
 
     handleFormChange(e: any) {
@@ -127,19 +127,52 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
         });
     }
 
-    handleSave() {
+    // TODO Refactor and cleanup
+    onSave(type: 'create' | 'edit') {
+        let entry: IEntry;
+        let editor: string;
+        if (type === 'create') {
+            entry = { ...this.state.currentEntry };
+            entry.id = Date.now();
+            editor = 'currentEntry';
+        } else if (type === 'edit') {
+            entry = { ...this.state.editEntry };
+            editor = 'editEntry';
+        }
 
-    }
-
-    renderEditForm(area: "create" | "edit") {
-        let editor;
-        if (area === "create") {
-            editor = "currentEntry";
-        } else if (area === "edit") {
-            editor = "editEntry";
-        } else {
+        const validation = _.val.Entry(entry);
+        if (!validation.status) {
+            const messages = validation.data.map(message => <span key={message}>{message}</span>);
+            this.setState({
+                alert: {
+                    open: true,
+                    title: 'Error',
+                    message: messages,
+                    close: {
+                        onClose: this.resetAlert,
+                        label: 'OK',
+                    },
+                    confirm: false,
+                }
+            });
             return;
         }
+
+        this.props.TimelineApiClient.updateTimeline(entry);
+        this.setState((state: ITimelineAppState) => {
+            const newState = { ...state };
+            newState.entries = this.props.TimelineApiClient.getTimeline().data;
+            newState[editor] = { ...config.timeline.entry.blankEntry };
+            return newState;
+        });
+    }
+
+    // Use proper enums
+    renderEditForm(area: 'create' | 'edit') {
+        let editor;
+        if (area === 'create') { editor = 'currentEntry' }
+        else if (area === 'edit') { editor = 'editEntry' }
+        else { return }
 
         return (
             <div>
@@ -157,39 +190,70 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
                     formStyles={inputStyle}
                     onChange={this.handleQuillFormChange}
                     isFocused={this.state[editor].body.length !== 0}
-                    toolbar="inline"
+                    toolbar='inline'
+                    placeholder='Event'
                 />
-                <ChipInput
+                <Autocomplete
+                    multiple
+                    freeSolo
+                    filterSelectedOptions
+                    options={this.state.tags.map(option => option.title)}
                     value={this.state[editor].tags}
-                    onAdd={(chip) => {
+                    renderTags={(value: string[], getTagProps) =>
+                        value.map((option: string, index: number) => (
+                            <Chip
+                                key={index}
+                                variant='outlined'
+                                label={option}
+                                style={{ height: 'auto', marginRight: 5 }}
+                                onDelete={(_chip) => {
+                                    this.setState((state: ITimelineAppState) => {
+                                        const newState = { ...state };
+                                        newState[editor].tags.splice(index, 1);
+                                        return newState;
+                                    });
+                                }}
+                            />
+                        ))
+                    }
+                    onChange={(_event, values) => {
                         this.setState((state: ITimelineAppState) => {
                             const newState = { ...state };
-                            newState[editor].tags.push(chip);
+                            newState[editor].tags = values;
                             return newState;
                         });
                     }}
-                    onDelete={(_chip, index) => {
-                        this.setState((state: ITimelineAppState) => {
-                            const newState = { ...state };
-                            newState[editor].tags.splice(index, 1);
-                            return newState;
-                        });
-                    }}  
-                    placeholder="Tags"
+                    renderInput={params => (
+                        <TextField {...params} placeholder='Tags' fullWidth />
+                      )}
                 />
-                <Divider style={{ margin: config.styles.spacing.thin + "px 0" }}/>
-                <div style={{ textAlign: "right" }}>
+                <Divider style={{ margin: config.styles.spacing.thin + 'px 0' }}/>
+                <div style={{ width: '50%', display: 'inline-block' }}>
+                    {area === 'edit' &&
+                        <IconButton onClick={() => this.onDelete(this.state[editor].id)}>
+                            <DeleteIcon />
+                        </IconButton>
+                    }
+                </div>
+                <div style={{ width: '50%', textAlign: 'right', display: 'inline-block' }}>
+                    {area === 'edit' &&
+                        <Button 
+                            onClick={() => { this.setState({ editEntry: undefined }) }}
+                            variant='contained'
+                            style={{ 
+                                marginRight: config.styles.spacing.thin, 
+                                borderRadius: 0,
+                                fontSize: 13
+                            }}>
+                            <CancelIcon style={{ marginRight: config.styles.spacing.thin }} />CANCEL
+                        </Button>
+                    }
                     <Button 
-                        onClick={this.handleSave}
+                        onClick={() => this.onSave(area)}
                         color='secondary'
                         variant='contained'
-                        style={{ 
-                            margin: '0 ' + config.styles.spacing.thin + 'px 0 auto', 
-                            color: 'white',
-                            borderRadius: 0,
-                            fontSize: 13
-                        }}>
-                        <SaveIcon style={{ marginRight: config.styles.spacing.default }} />Save
+                        style={{ color: 'white', borderRadius: 0, fontSize: 13 }}>
+                        <SaveIcon style={{ marginRight: config.styles.spacing.thin }} />Save
                     </Button>
                 </div>
             </div>
@@ -197,96 +261,97 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
     }
 
     renderTimelineList(age: AgeChar) {
-        const filtered = hcal.filterEntriesByAge(this.state.entries, age);
-
+        const filtered = _.cal.sortByDate(_.cal.filterEntriesByAge(this.state.entries, age));
         const list = [];
 
         filtered.forEach((entry: IEntry, key: number) => {
             if (this.state.editEntry!== undefined && this.state.editEntry.id === entry.id) {
                 list.push(
                     <ListItem
-                        dense key={entry.id}
-                        style={{
-                            color: config.styles.colours.text.default
-                        }}
+                        key={entry.id}
+                        style={{ color: config.styles.colours.text.default, display: 'block' }}
                     >
                         <Divider />
-                        {this.renderEditForm("edit")}
+                        <div style={{ margin: config.styles.spacing.default + 'px 0' }}>
+                            {this.renderEditForm('edit')}
+                        </div>
                         <Divider />
                     </ListItem>
                 );
             } else {
                 list.push(
-                    <ListItem
-                        button dense key={entry.id}
-                        style={{
-                            color: config.styles.colours.text.default
-                        }}
+                    <ListItem 
+                        button dense
+                        key={entry.id}
+                        style={{ color: config.styles.colours.text.default }}
                     > 
                         <ListItemText
+                            disableTypography
                             primary={
                                 <React.Fragment>
-                                    <Typography component='span' variant='h6' color='textPrimary'>{entry.date}</Typography>
+                                    <Typography variant='h6' color='textPrimary'>{entry.date}</Typography>
                                 </React.Fragment>
                             }
                             secondary={
                                 <React.Fragment>
-                                    <Typography component='span' variant='body2' color='textPrimary'>{entry.body}</Typography>
-                                </React.Fragment>
-                            }
+                                    <Typography component ='div' color='textPrimary'>
+                                        <div className='entry-description'>{ReactHtmlParser(entry.body)}</div>
+                                    </Typography>
+                                </React.Fragment>}
+                            onClick={() => {
+                                this.setState((state: ITimelineAppState) => {
+                                    const key = Object.keys(state.entries).find(key => state.entries[key].id === entry.id);
+                                    return { editEntry: JSON.parse(JSON.stringify(state.entries[key])) }
+                                });
+                            }}
                         />
-                        <ListItemSecondaryAction>
-                            <IconButton
-                                edge='end'
-                                onClick={() => {
-                                    this.setState((state: ITimelineAppState) => {
-                                        const key = Object.keys(state.entries).find(key => state.entries[key].id === entry.id);
-                                        return {
-                                            editEntry: state.entries[key],
-                                        }
-                                    });
-                                }}
-                            ><EditIcon /></IconButton>
-                        </ListItemSecondaryAction>
                     </ListItem>
                 );
             }
         });
 
-        return(
-            <List dense disablePadding>
-                {list}
-            </List>
-        );
+        return <List dense disablePadding>{list}</List>;
     }
 
     render() {
-        console.log(this.state);
         return (
-            <div style={{ ...config.styles.container, marginTop: 100, }}>
-                <ExpansionPanel
-                    square
-                    className='u-height-transition'
-                >
-                    <ExpansionPanelSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        id="add-entry"
-                    >Add Entry
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails style={{ display: "block" }}>
-                        {this.renderEditForm("create")}
-                    </ExpansionPanelDetails>
+            <div style={{ ...config.styles.container, marginTop: 100, }} id='Timeline'>
+                <ExpansionPanel square className='u-height-transition'>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} id='add-entry'>Add Entry</ExpansionPanelSummary>
+                    <ExpansionPanelDetails style={{ display: 'block' }}>{this.renderEditForm('create')}</ExpansionPanelDetails>
                 </ExpansionPanel>
 
-                <Card style={{ marginTop: config.styles.spacing.default }}>
-                    <CardHeader 
-                        title={SubCategories.TheAgeOfCreation}
-                        className="Timeline_Title"
-                    />
-                    <CardContent>
-                        {this.renderTimelineList(AgeChar.TheAgeOfCreation)}
-                    </CardContent>
+                <Card square style={{ marginTop: config.styles.spacing.default }}>
+                    <CardHeader  title={SubCategories.TheAgeOfCreation} className='Timeline_Title' />
+                    <CardContent>{this.renderTimelineList(AgeChar.TheAgeOfCreation)}</CardContent>
                 </Card>
+
+                <Card square style={{ marginTop: config.styles.spacing.default }}>
+                    <CardHeader title={SubCategories.TheAgeOfRaces} className='Timeline_Title' />
+                    <CardContent>{this.renderTimelineList(AgeChar.TheAgeOfRaces)}</CardContent>
+                </Card>
+
+                <Card square style={{ marginTop: config.styles.spacing.default }}>
+                    <CardHeader title={SubCategories.TheAgeOfEmpires} className='Timeline_Title' />
+                    <CardContent>{this.renderTimelineList(AgeChar.TheAgeOfEmpires)}</CardContent>
+                </Card>
+
+                <Card square style={{ marginTop: config.styles.spacing.default }}>
+                    <CardHeader title={SubCategories.TheAgeOfUncertainty} className='Timeline_Title' />
+                    <CardContent>{this.renderTimelineList(AgeChar.TheAgeOfUncertainty)}</CardContent>
+                </Card>
+
+                <Card square style={{ margin: config.styles.spacing.default + 'px 0' }}>
+                    <CardHeader title={SubCategories.TheAgeOfAwakening} className='Timeline_Title' />
+                    <CardContent>{this.renderTimelineList(AgeChar.TheAgeOfAwakening)}</CardContent>
+                </Card>
+                <Alert
+                    open={this.state.alert.open}
+                    title={this.state.alert.title}
+                    message={this.state.alert.message}
+                    close={this.state.alert.close}
+                    confirm={this.state.alert.confirm}
+                />
             </div>
         )
     }

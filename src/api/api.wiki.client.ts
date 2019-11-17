@@ -1,6 +1,6 @@
 import { WikiApiServer } from './api.wiki.server';
 
-import { IDefaultResponse } from './api.interfaces';
+import { IDefaultResponse } from '@interfaces';
 import { ISource } from './api.search.client';
 import { IPage } from '@interfaces';
 import { DataSources } from '@enums';

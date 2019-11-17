@@ -19,10 +19,7 @@ module.exports = {
         rules: [
             {
                 test: /\.ts|\.tsx$/,
-                exclude: [
-                    /node_modules/,
-                    /generators/,
-                ],
+                exclude: /node_modules/,
                 loader: "ts-loader"
             }
         ],
@@ -38,7 +35,7 @@ module.exports = {
             "@enums": path.join(__dirname, './src/enums'),
             "@interfaces": path.join(__dirname, './src/interfaces'),
             "@lib": path.join(__dirname, './src/lib'),
-            //"@language": path.join(__dirname, './src/apps/Languages/generators'),
+            "@store": path.join(__dirname, './src/store'),
         },
     },
     performance: {
@@ -46,6 +43,7 @@ module.exports = {
     },
     optimization: {
         minimizer: [new UglifyJsPlugin()],
+        usedExports: true,
     },
     plugins: [
         //new HardSourceWebpackPlugin()

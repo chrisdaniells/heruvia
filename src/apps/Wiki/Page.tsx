@@ -78,22 +78,13 @@ export default class Page extends React.Component<IPageProps, IPageState> {
 
         const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
         if (pageResponse.status) {
-            this.setState({ 
-                page: pageResponse.data,
-                archive: null,
-            });
+            this.setState({ page: pageResponse.data, archive: null });
         } else {
             const archiveResponse = this.props.WikiApiClient.getArchiveById(this.props.match.params.id);
             if (archiveResponse.status) {
-                this.setState({
-                    archive: archiveResponse.data,
-                    page: null,
-                });
+                this.setState({ archive: archiveResponse.data, page: null });
             } else {
-                this.setState({
-                    archive: null,
-                    page: null,
-                })
+                this.setState({ archive: null, page: null })
             }
         }
     }
@@ -110,7 +101,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                     message: 'The archived page could not be restored.',
                     close: {
                         onClose: this.resetAlert,
-                        label: "OK",
+                        label: 'OK',
                     },
                     confirm: false,
                 }
@@ -157,9 +148,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                     }}
                 >
                     <Grid item xs={6}>{detail.label}</Grid>
-                    <Grid
-                        item xs={6}
-                    >
+                    <Grid item xs={6}>
                         {isLink ? <Link to={sanitizeLink(detail.value, true)}>{detail.value.substring(1, detail.value.length)}</Link> : detail.value}
                     </Grid>
                 </Grid>
@@ -179,13 +168,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
             archived.push(
                 <ListItem button key={archive.last_updated}>
                     <Grid container>
-                        <Grid
-                            item
-                            xs={10}
-                            style={{
-                                lineHeight: '25px'
-                            }}
-                        >{'Last Updated: ' + timestamp}</Grid>
+                        <Grid item xs={10} style={{ lineHeight: '25px' }}>{'Last Updated: ' + timestamp}</Grid>
                         <Grid item xs={2}>
                             <Button
                                 variant='outlined'
@@ -231,19 +214,15 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                             </div>
                         }
                         title={page !== null ? page.title : ''}
-                        className="Wiki_Page_Title"
+                        className='Wiki_Page_Title'
                     />
                     <CardContent style={{ padding: config.styles.spacing.default }}>
                         {page === null &&
                             <div>
-                            <p
-                                style={{
-                                    marginBottom: config.styles.spacing.default
-                                }}
-                            >The page {this.props.WikiApiClient.getPageTitleFromId(this.props.match.params.id)} has not been found. Would you like to create it now?</p>
-                            <div>
-                                <CreatePageButton query={{ create: this.props.match.params.id }}/>
-                            </div>
+                                <p style={{ marginBottom: config.styles.spacing.default }}>
+                                    The page {this.props.WikiApiClient.getPageTitleFromId(this.props.match.params.id)} has not been found. Would you like to create it now?
+                                </p>
+                                <div><CreatePageButton query={{ create: this.props.match.params.id }}/></div>
 
                                 {this.state.archive !== null &&
                                     <div style={{
@@ -261,9 +240,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                             <div id='Page' className='heruvia-text'>
                                 <Breadcrumbs 
                                     className='wikipage-breadcrumbs'
-                                    style={{
-                                        marginBottom: config.styles.spacing.default
-                                    }}
+                                    style={{ marginBottom: config.styles.spacing.default }}
                                 >
                                     <Link to={config.routes.wiki.root}>Home</Link>
                                     <Link 
@@ -282,17 +259,14 @@ export default class Page extends React.Component<IPageProps, IPageState> {
 
                                 {page.images.main.length > 0 &&
                                     <div style={{
-                                        backgroundColor: "#f1f1f1",
-                                        textAlign: "center",
+                                        backgroundColor: '#f1f1f1',
+                                        textAlign: 'center',
                                         marginBottom: config.styles.spacing.default
                                     }}>
                                         <img
                                             src={config.paths.images + '/' + page.images.main} id='main-image'
                                             className='wikipage-main-image'
-                                            style={{
-                                                maxWidth: '100%',
-                                                maxHeight: 500,
-                                            }}
+                                            style={{ maxWidth: '100%', maxHeight: 500 }}
                                         />
                                     </div>
                                 }
@@ -300,18 +274,14 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                 <Grid
                                     container
                                     alignItems='flex-start'
-                                    style={{
-                                        marginBottom: config.styles.spacing.default
-                                    }}
+                                    style={{ marginBottom: config.styles.spacing.default }}
                                 >
                                     {page.preface.length > 0 &&
                                         <Grid 
                                             item
                                             xs={page.details.length > 0 ? 7 : 12}
                                             className='wiki-preface heruvia-text'
-                                            style={{
-                                                paddingRight: config.styles.spacing.default
-                                            }}
+                                            style={{ paddingRight: config.styles.spacing.default }}
                                         >
                                             {ReactHtmlParser(page.preface)}
                                         </Grid>

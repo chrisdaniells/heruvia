@@ -19,7 +19,7 @@
       "@interfaces": ["interfaces/index"],
       "@lib/*": ["lib/*"],
       "@root/*": ["./*"],
-      //"@language/*": ["apps/Languages/generators/*"]
+      "@store/*": ["store/*"],
     }
   }
 }

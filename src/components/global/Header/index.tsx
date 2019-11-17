@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 
-import { normalizeString } from "@lib/normalize";
+import _ from '@lib/herulib';
 
 import config from '@config';
 import { DataSources } from '@enums';
@@ -88,11 +88,10 @@ class Header extends React.Component<any, IHeaderState> {
 
     handleSearchInput(e: any): void {
         clearTimeout(this.searchTimer);
-        const searchTerm = normalizeString(e.currentTarget.value);
+        const searchTerm = _.lang.normalizeString(e.currentTarget.value);
 
         this.searchTimer = setTimeout(() => {
-            const searchResults = searchTerm.length >= 2 ?
-                this.props.SearchApiClient.getSearchResults(searchTerm) : [];
+            const searchResults = searchTerm.length >= 2 ? this.props.SearchApiClient.getSearchResults(searchTerm) : [];
     
             this.setState({
                 searchTerm,
@@ -109,9 +108,7 @@ class Header extends React.Component<any, IHeaderState> {
     }
 
     onSearchDrawerClose() {
-        this.setState({
-            searchDrawerOpen: false
-        });
+        this.setState({ searchDrawerOpen: false });
     }
 
     render() {
@@ -119,14 +116,9 @@ class Header extends React.Component<any, IHeaderState> {
             <div id='Header'>
                 <AppBar 
                     position='fixed'
-                    style={{
-                        background: 'white'
-                    }}
+                    style={{ background: 'white' }}
                 >
-                    <Toolbar 
-                        variant='dense' 
-                        style={config.styles.container}
-                    >
+                    <Toolbar variant='dense' style={config.styles.container}>
                         <Grid container justify='space-between'>
                             <Grid item>
                                 <IconButton 
@@ -151,10 +143,7 @@ class Header extends React.Component<any, IHeaderState> {
                     </Toolbar>
                 </AppBar>
 
-                <Drawer
-                    open={this.state.drawerOpen}
-                    onClose={this.toggleDrawer}
-                >
+                <Drawer open={this.state.drawerOpen} onClose={this.toggleDrawer}>
                     <List
                         subheader={
                             <ListSubheader 

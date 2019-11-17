@@ -6,7 +6,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import theme from './theme';
 import config from './config';
 
-import { SearchApiClient, WikiApiClient } from '@api';
+import { SearchApiClient, WikiApiClient, TimelineApiClient } from '@api';
 
 import WikiApp from '@apps/Wiki';
 import WikiPage from '@apps/wiki/Page';
@@ -20,10 +20,12 @@ import Header from '@components/global/Header';
 
 const wikiApiClient = new WikiApiClient();
 const searchApiClient = new SearchApiClient();
+const timelineApiClient = new TimelineApiClient();
 
-const WikiAppProps = {
+const AppProps = {
     WikiApiClient: wikiApiClient,
     SearchApiClient: searchApiClient,
+    TimelineApiClient : timelineApiClient,
 }
 
 ReactDOM.render((
@@ -35,35 +37,38 @@ ReactDOM.render((
                     SearchApiClient={searchApiClient}
                 />
                 <Switch>
-                    <Route path='/timeline' component={TimelineApp} />
+                    <Route
+                        path={config.routes.timeline.root}
+                        render={(props) => (<TimelineApp {...props} {...AppProps} />)}
+                    />
 
                     <Route
-                        path='/wiki/list/:attribute/:value'
-                        render={(props) => (<WikiListing {...props} {...WikiAppProps} />)}
+                        path={config.routes.wiki.list + '/:attribute/:value'}
+                        render={(props) => (<WikiListing {...props} {...AppProps} />)}
                     />
                     <Route 
                         path={config.routes.wiki.page + '/:id'}
-                        render={(props) => (<WikiPage {...props} {...WikiAppProps} />)} 
+                        render={(props) => (<WikiPage {...props} {...AppProps} />)} 
                     />
                     <Route 
                         path={config.routes.wiki.edit + '/:id?'}
-                        render={(props) => (<WikiEdit {...props} {...WikiAppProps} />)} 
+                        render={(props) => (<WikiEdit {...props} {...AppProps} />)} 
                     />
                     <Route 
                         path={config.routes.wiki.print + '/:id'}
-                        render={(props) => (<WikiPrint {...props} {...WikiAppProps} />)} 
+                        render={(props) => (<WikiPrint {...props} {...AppProps} />)} 
                     />
                     <Route 
                         exact 
                         path={config.routes.wiki.root}
-                        render={(props) => (<WikiApp {...props} {...WikiAppProps} />)} 
+                        render={(props) => (<WikiApp {...props} {...AppProps} />)} 
                     />
                     <Route
                         exact
                         path='/'
-                        render={(props) => (<WikiApp  {...props} {...WikiAppProps} />)}
+                        render={(props) => (<WikiApp  {...props} {...AppProps} />)}
                     />
-                    <Route render={(props) => (<WikiApp {...props} {...WikiAppProps} />)} />
+                    <Route render={(props) => (<WikiApp {...props} {...AppProps} />)} />
                 </Switch>
             </ScrollToTop>
         </Router>

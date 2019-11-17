@@ -32,11 +32,11 @@ export default class SubcategoryItem extends React.Component<ICategoryItemProps,
     }
 
     render() {
-        const link = "/wiki/list/subcategory/" + this.props.subcategory;
+        const link = '/wiki/list/subcategory/' + this.props.subcategory;
         return (
             <ListItem
                 button 
-                style={{ textTransform: "capitalize" }}
+                style={{ textTransform: 'capitalize' }}
                 component={Link}
                 to={link}
                 selected={link === this.props.location}

@@ -111,8 +111,8 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
     }
 
     handleDetailDrag(e: any, index: number) {
-        e.dataTransfer.setData("index", index);
-        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData('index', index);
+        e.dataTransfer.effectAllowed = 'move';
 
         this.draggedItem = index;
     }
@@ -154,7 +154,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                     <Grid item>
                             <Input
                                 name={detail.label}
-                                type="text"
+                                type='text'
                                 value={this.state.details[index].label}
                                 onChange={(e) => { this.handleInput('label', e.target.value, index) }}
                                 style={{
@@ -165,7 +165,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                     <Grid item>
                         <Input
                             name={detail.value}
-                            type="text"
+                            type='text'
                             value={this.state.details[index].value}
                             onChange={(e) => { this.handleInput('value', e.target.value, index) }}
                         />
@@ -195,11 +195,11 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                             <Input
                                 name='detail-label'
                                 id='detail-label'
-                                type="text"
+                                type='text'
                                 value={this.state.current.label}
                                 onChange={(e) => { this.handleNewInput('label', e.target.value) }}
                                 style={{ marginRight: config.styles.spacing.default }}
-                                placeholder="Detail"
+                                placeholder='Detail'
                             />
                         </FormControl>
                     </Grid>
@@ -209,7 +209,7 @@ export default class DetailsEditableList extends React.Component<IDetailsInputLi
                             <Input
                                 name='detail-value'
                                 id='detail-value'
-                                type="text"
+                                type='text'
                                 value={this.state.current.value}
                                 onChange={(e) => { this.handleNewInput('value', e.target.value) }}
                                 style={{ marginRight: config.styles.spacing.default }}

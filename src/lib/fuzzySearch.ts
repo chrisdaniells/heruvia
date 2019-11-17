@@ -1,4 +1,4 @@
-import { normalizeCharacter, normalizeString } from "@lib/normalize";
+import _ from '@lib/herulib';
 
 export default class HeruviaFuzzySearch {
     haystack: any;
@@ -24,7 +24,7 @@ export default class HeruviaFuzzySearch {
             return this.haystack;
         }
 
-        query = normalizeCharacter(query);
+        query = _.lang.normalizeCharacter(query);
 
         const results = [];
 
@@ -70,7 +70,7 @@ export default class HeruviaFuzzySearch {
     }
 
     public isMatch(item, query, caseSensitive) {
-        item = normalizeCharacter(item);
+        item = _.lang.normalizeCharacter(item);
 
         if (!caseSensitive) {
             item = item.toLocaleLowerCase();
@@ -83,7 +83,7 @@ export default class HeruviaFuzzySearch {
         let index = 0;
 
         for (let i = 0; i < letters.length; i++) {
-            const letter = normalizeCharacter(letters[i]);
+            const letter = _.lang.normalizeCharacter(letters[i]);
 
             index = item.indexOf(letter, index);
 
@@ -132,7 +132,7 @@ export default class HeruviaFuzzySearch {
             value = object[firstSegment];
             if (value !== null && typeof value !== 'undefined') {
                 if (!remaining && (typeof value === 'string' || typeof value === 'number')) {
-                    list.push(normalizeString(value.toString()));
+                    list.push(_.lang.normalizeString(value.toString()));
                 } else if (Object.prototype.toString.call(value) === '[object Array]') {
                     for (index = 0, length = value.length; index < length; index++) {
                         this.getDescendantProperty(value[index], remaining, list);

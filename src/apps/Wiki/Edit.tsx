@@ -38,9 +38,7 @@ interface IEditState {
     alert: IAlertProps
 }
 
-const inputStyle = {
-    marginBottom: config.styles.spacing.default
-}
+const inputStyle = { marginBottom: config.styles.spacing.default }
 
 export default class Edit extends React.Component<IEditProps, IEditState> {
     constructor(props: IEditProps, state: IEditState) {
@@ -66,7 +64,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                     message: 'The page you are looking for has not been found.',
                     close: {
                         onClose: this.resetAlert,
-                        label: "OK",
+                        label: 'OK',
                     },
                     confirm: false,
                 };
@@ -111,9 +109,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     resetAlert(): void {
-        this.setState (state => ({
-            alert: { ...state.alert, open: false }
-        }),() => {
+        this.setState (state => ({ alert: { ...state.alert, open: false }}), () => {
             // Otherwise text disappears before dialog closes
             setTimeout(() => {
                 this.setState(state => ({
@@ -175,10 +171,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         if (!uploads.status) return;
         
         switch(name) {
-            case "main-image":
+            case 'main-image':
                 page.images.main = uploads.data[0];
                 break;
-            case "other-images":
+            case 'other-images':
                 page.images.other = [ ...page.images.other, ...uploads.data ];
                 break;
         }
@@ -191,8 +187,8 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 open: true,
                 title: 'Delete Page',
                 message: 'Are you sure you want to delete this page?',
-                close: { onClose: this.resetAlert, label: "Cancel" },
-                confirm: { onConfirm: this.handleDeleteConfirm, label: "Yes" }
+                close: { onClose: this.resetAlert, label: 'Cancel' },
+                confirm: { onConfirm: this.handleDeleteConfirm, label: 'Yes' }
             }
         });
     }
@@ -229,15 +225,15 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
             <div>
                 {this.state.page.images.main.length > 0 &&
                     <div style={{ 
-                            textAlign: "center", 
+                            textAlign: 'center', 
                             marginBottom: config.styles.spacing.thin,
-                            position: "relative"
+                            position: 'relative'
                         }}
                     >
                         <IconButton
-                            className="Wiki_IconOverlayBlend"
+                            className='Wiki_IconOverlayBlend'
                             style={{
-                                position: "absolute",
+                                position: 'absolute',
                                 top: config.styles.spacing.default,
                                 right: config.styles.spacing.default + 10,
                             }}
@@ -253,11 +249,11 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         <img 
                             src={config.paths.images + '/' + this.state.page.images.main}
                             style={{
-                                height: "auto",
-                                width: "auto",
+                                height: 'auto',
+                                width: 'auto',
                                 maxHeight: 500,
-                                maxWidth: "100%",
-                                margin: "0 auto"
+                                maxWidth: '100%',
+                                margin: '0 auto'
                             }}
                         />
                     </div>
@@ -275,10 +271,8 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         marginBottom: config.styles.spacing.thin
                     }}
                 >
-                    <ImageIcon 
-                        style={{ 
-                            marginRight: config.styles.spacing.thin 
-                        }}/>{this.state.page.images.main.length ? 'Change' : 'Upload' } Main Image
+                    <ImageIcon  style={{ marginRight: config.styles.spacing.thin }} />
+                    {this.state.page.images.main.length ? 'Change' : 'Upload' } Main Image
                     <input
                         accept='image/*'
                         name='main-image'
@@ -305,17 +299,14 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                             marginBottom: config.styles.spacing.thin,
                         }}
                         >
-                        <img
-                            src={config.paths.images + '/' + image} 
-                            style={{ width: 'auto', height: 150 }} 
-                        />
+                        <img src={config.paths.images + '/' + image} style={{ width: 'auto', height: 150 }} />
                         <IconButton 
                             onClick={() => {
                                 let page = { ...this.state.page };
                                 page.images.other.splice(index, 1);
                                 this.setState({ page });
                             }}
-                            className="Wiki_IconOverlayBlend"
+                            className='Wiki_IconOverlayBlend'
                             style={{
                                 position: 'absolute',
                                 left: 0,
@@ -413,10 +404,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                         inputProps={{ name: 'category' }}
                         style={{ textTransform: 'capitalize' }}
                     >
-                        <MenuItem 
-                            value=''
-                            style={{ color: config.styles.colours.text.faint }}
-                        >Select Category</MenuItem>
+                        <MenuItem value='' style={{ color: config.styles.colours.text.faint }}>Select Category</MenuItem>
                         {categoryItems}
                     </Select>
                 </FormControl>

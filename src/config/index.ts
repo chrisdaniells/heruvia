@@ -3,12 +3,15 @@ import path from 'path';
 import categoriesConfig from './config.wiki.categories';
 import stylesConfig from './config.styles';
 import templatesConfig from './config.wiki.templates';
+import alertConfig from './config.alert';
+import entryConfig from './config.timeline.entry';
 
 const config: { [key: string] : any } = {
     paths: {
-        wikipages: path.normalize(path.resolve(__dirname, 'json/pages')) + '\\',
-        wikiarchive: path.normalize(path.resolve(__dirname, 'json/archive/pages')) + '\\',
-        languages: path.normalize(path.resolve(__dirname, 'json/languages')) + '\\',
+        wikipages: path.normalize(path.resolve(__dirname, 'json/wiki/pages')) + '\\',
+        wikiarchive: path.normalize(path.resolve(__dirname, 'json/wiki/archive/pages')) + '\\',
+        timeline: path.normalize(path.resolve(__dirname, 'json/timeline'))  + '\\',
+        timelineArchive: path.normalize(path.resolve(__dirname, 'json/timeline/archive')) + '\\',
         images: path.normalize(path.resolve(__dirname, 'images')) + '\\',
         thumbnails: path.normalize(path.resolve(__dirname, 'images/thumbnails')) + '\\'
     },
@@ -20,21 +23,19 @@ const config: { [key: string] : any } = {
             list: '/wiki/list',
             print: '/wiki/print',
         },
-        language: {
-            page: '/language',
-        },
         timeline: {
-            page: '/timeline',
-        },
-        todo: {
-            page: '/todo',
+            root: '/timeline',
         },
     },
     wiki: {
         categories: categoriesConfig,
         templates: templatesConfig,
     },
+    timeline: {
+        entry: entryConfig,
+    },
     styles: stylesConfig,
+    alert: alertConfig,
 }
 
 export default config;

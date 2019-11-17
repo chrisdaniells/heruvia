@@ -55,7 +55,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
 
     componentDidMount() {
         this.fetchPage();
-        document.getElementById('Header').style.display = "none";
+        document.getElementById('Header').style.display = 'none';
     }
 
     componentDidUpdate(prevProps: IPageProps) {

@@ -1,4 +1,4 @@
-import { IDefaultResponse } from './api.interfaces';
+import { IDefaultResponse } from '@interfaces';
 
 const fs = (window as any).require('fs');
 const path = (window as any).require('path');

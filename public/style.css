@@ -111,6 +111,13 @@ a:hover {
     font-size: 30px !important;
 }
 
+#Timeline .entry-description {
+    color: black !important;
+}
+#Timeline .entry-description p {
+    margin: 0 !important;
+}
+
 /* HTML TEXT STYLES */
 .heruvia-text h1 {
     font-weight: normal !important;

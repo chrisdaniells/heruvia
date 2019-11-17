@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { normalizeString } from "@lib/normalize";
+import _ from '@lib/herulib';
 
-import { SearchApiClient, WikiApiClient, IDefaultResponse } from '@api';
+import { SearchApiClient, WikiApiClient } from '@api';
+import { IDefaultResponse } from'@interfaces';
 import config from '@config';
 
 import {
@@ -10,7 +11,7 @@ import {
     Tab,
     Tabs,
 } from '@material-ui/core';
-import { PageListFilters } from '@apps/Wiki/enums';
+import { PageListFilters } from '@enums';
 
 import DisplayWrap from '@components/global/DisplayWrap';
 import PageList from '@components/wiki/PageList';
@@ -61,10 +62,11 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
         let pages = [ ...this.state.pages ];
 
         switch(filter) {
+            // TODO Move Sort Functions to Herulib
             case PageListFilters.All:
                 pages.sort((a: any, b: any) => {
-                        if (normalizeString(a.title) > normalizeString(b.title)) return +1;
-                        else if (normalizeString(a.title) < normalizeString(b.title)) return -1;
+                        if (_.lang.normalizeString(a.title) > _.lang.normalizeString(b.title)) return +1;
+                        else if (_.lang.normalizeString(a.title) < _.lang.normalizeString(b.title)) return -1;
                         else return 0;  
                     });
                 break;
@@ -109,25 +111,16 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
                         <Tab label={PageListFilters.RecentlyCreated} style={tabStyles} />
                         
                     </Tabs>
-                        <DisplayWrap 
-                            show={this.state.selectedPagesTab === 0}
-                            style={paperStyles}
-                        >
+                        <DisplayWrap show={this.state.selectedPagesTab === 0} style={paperStyles}>
                             <PageList pages={this.filterPages(PageListFilters.All)} edit={true} />
                         </DisplayWrap>
-                        <DisplayWrap 
-                            show={this.state.selectedPagesTab === 1}
-                            style={paperStyles}
-                        >
+                        <DisplayWrap show={this.state.selectedPagesTab === 1} style={paperStyles}>
                             <PageList 
                                 pages={this.filterPages(PageListFilters.RecentlyModified, 5)} 
                                 edit={true}
                             />
                         </DisplayWrap>
-                        <DisplayWrap 
-                            show={this.state.selectedPagesTab === 2}
-                            style={paperStyles}
-                        >
+                        <DisplayWrap show={this.state.selectedPagesTab === 2} style={paperStyles}>
                             <PageList 
                                 pages={this.filterPages(PageListFilters.RecentlyCreated, 5)}
                                 edit={true}
