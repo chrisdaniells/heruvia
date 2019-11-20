@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 
-import { WikiApiClient } from '@api';
+import _ from '@lib/herulib';
+
+import { getPages } from '@store/actions/wikiActions';
 
 import {
     Breadcrumbs,
@@ -27,72 +30,56 @@ import CreatePageButton from '@components/wiki/CreatePageButton';
 import ImageGallery from '@components/global/ImageGallery';
 import { sanitizeLink } from '@components/global/QuillEditor';
 
-import { IPage } from '@interfaces';
+import { IPage, IDetailsItem, IStoreState } from '@interfaces';
 
 import config from '@config';
 
 interface IPageProps {
-    WikiApiClient: WikiApiClient;
     history: any;
     match: any;
     location: any;
+    wiki?: any;
+    getPages: any;
 }
 
 interface IPageState {
-    page: IPage | null;
-    archive: any | null;
     alert: IAlertProps
 }
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            wiki: store.wiki,
+        };
+    },
+    (dispatch: any) => {
+        return {
+            getPages: () => dispatch(getPages()),
+        }
+    }
+)
 export default class Page extends React.Component<IPageProps, IPageState> {
     constructor(props: IPageProps, state: IPageState) {
         super(props, state);
 
-        let alert: IAlertProps = { open: false, title: '', message: '', close: false, confirm: false };
+        let alert: IAlertProps = { ...config.alert.blankAlert };
 
-        this.fetchPage = this.fetchPage.bind(this);
         this.renderDetails = this.renderDetails.bind(this);
         this.renderArchivedVersions = this.renderArchivedVersions.bind(this);
         this.restoreArchive = this.restoreArchive.bind(this);
         this.resetAlert = this.resetAlert.bind(this);
 
         this.state = {
-            page: null,
-            archive: null,
             alert,
         }
     }
 
-    componentDidMount() {
-        this.fetchPage();
-    }
-
-    componentDidUpdate(prevProps: IPageProps) {
-        if (this.props.location.pathname !== prevProps.location.pathname) {
-            this.fetchPage();
-        }
-    }
-
-    fetchPage() {
-        if (!this.props.match.params.id) return;
-
-        const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
-        if (pageResponse.status) {
-            this.setState({ page: pageResponse.data, archive: null });
-        } else {
-            const archiveResponse = this.props.WikiApiClient.getArchiveById(this.props.match.params.id);
-            if (archiveResponse.status) {
-                this.setState({ archive: archiveResponse.data, page: null });
-            } else {
-                this.setState({ archive: null, page: null })
-            }
-        }
-    }
-
     restoreArchive(archive: IPage) {
-        const restoreResponse = this.props.WikiApiClient.restoreArchive(archive);
-        if (restoreResponse.status) {
-            this.fetchPage();
+        archive.last_updated = Date.now();
+        const restoreResponse = _.file.saveFile(archive, config.paths.wikipages + archive.id + '.json');
+        
+        if (restoreResponse) {
+            this.props.getPages();
         } else {
             this.setState({
                 alert: {
@@ -115,29 +102,21 @@ export default class Page extends React.Component<IPageProps, IPageState> {
         }),() => {
             // Otherwise text disappears before dialog closes
             setTimeout(() => {
-                this.setState(state => ({
-                    alert: {
-                        ...state.alert,
-                        title: '',
-                        message: '',
-                        close: false,
-                        confirm: false,
-                    }
-                }));
+                this.setState({ alert: { ...config.alert.blankAlert }});
             }, 100);
         });
     }
 
-    renderDetails() {
-        const details: any[] = [];
+    renderDetails(details: IDetailsItem[]) {
+        const detailItems: any[] = [];
 
-        this.state.page.details.forEach((detail: any, index: number) => {
+        details.forEach((detail: any, index: number) => {
             const isFirst = (index === 0);
-            const isLast = (this.state.page.details.length-1 === index);
+            const isLast = (details.length-1 === index);
 
             const isLink = ['?', '!', '@', '&'].indexOf(detail.value[0]) > -1;
 
-            details.push(
+            detailItems.push(
                 <Grid
                     container 
                     key={detail.label + detail.value}
@@ -155,36 +134,48 @@ export default class Page extends React.Component<IPageProps, IPageState> {
             );
         });
 
-        return details;
+        return detailItems;
     }
 
     renderArchivedVersions() {
-        if (this.state.archive === null) return;
+        const filepath = config.paths.wikiarchive + this.props.match.params.id + '.json';
+        const archiveResponse = _.file.getFileJson(filepath);
 
-        const archived: any[] = [];
-        
-        this.state.archive.forEach(archive => {
-            const timestamp = new Date(archive.last_updated);
-            archived.push(
-                <ListItem button key={archive.last_updated}>
-                    <Grid container>
-                        <Grid item xs={10} style={{ lineHeight: '25px' }}>{'Last Updated: ' + timestamp}</Grid>
-                        <Grid item xs={2}>
-                            <Button
-                                variant='outlined'
-                                onClick={(e) => { this.restoreArchive(archive) }}
-                            >Restore</Button>
+        if (archiveResponse) {
+            const archived: any[] = [];
+            archiveResponse.forEach(archive => {
+                const timestamp = new Date(archive.last_updated);
+                archived.push(
+                    <ListItem button key={archive.last_updated}>
+                        <Grid container>
+                            <Grid item xs={10} style={{ lineHeight: '25px' }}>{'Last Updated: ' + timestamp}</Grid>
+                            <Grid item xs={2}>
+                                <Button
+                                    variant='outlined'
+                                    onClick={(e) => { this.restoreArchive(archive) }}
+                                >Restore</Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </ListItem>
+                    </ListItem>
+                );
+            });
+    
+            return (
+                <div style={{
+                    border: '1px solid ' + config.styles.colours.line,
+                    padding: config.styles.spacing.default,
+                    marginTop: 60
+                }}>
+                    <div>This page has the following archived versions:</div>
+                    <List>{archived}</List>
+                </div>
             );
-        });
-
-        return <List>{archived}</List>;
+        }
     }
 
     render() {
-        const page = this.state.page;
+        const page = this.props.wiki.pages.find((page: IPage) =>
+            page.id === this.props.match.params.id);
 
         return (
             <div style={{ ...config.styles.container, marginTop: 100 }}>
@@ -193,7 +184,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                         action={
                             <div>
                                 <IconButton onClick={this.props.history.goBack}><BackIcon /></IconButton>
-                                {page !== null &&
+                                {page !== undefined &&
                                     <IconButton 
                                         component={Link}
                                         to={config.routes.wiki.print + '/' + page.id}
@@ -202,7 +193,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                         <PrintIcon />
                                     </IconButton>
                                 }
-                                {page !== null &&
+                                {page !== undefined &&
                                     <IconButton 
                                         component={Link}
                                         to={config.routes.wiki.edit + '/' + page.id}
@@ -213,30 +204,21 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                 <IconButton component={Link} to={config.routes.wiki.root}><HomeIcon /></IconButton>
                             </div>
                         }
-                        title={page !== null ? page.title : ''}
+                        title={page !== undefined ? page.title : ''}
                         className='Wiki_Page_Title'
                     />
                     <CardContent style={{ padding: config.styles.spacing.default }}>
-                        {page === null &&
+                        {page === undefined &&
                             <div>
                                 <p style={{ marginBottom: config.styles.spacing.default }}>
-                                    The page {this.props.WikiApiClient.getPageTitleFromId(this.props.match.params.id)} has not been found. Would you like to create it now?
+                                    The page {_.wiki.getPageTitleFromId(this.props.match.params.id)} has not been found. Would you like to create it now?
                                 </p>
                                 <div><CreatePageButton query={{ create: this.props.match.params.id }}/></div>
 
-                                {this.state.archive !== null &&
-                                    <div style={{
-                                        border: '1px solid ' + config.styles.colours.line,
-                                        padding: config.styles.spacing.default,
-                                        marginTop: 60
-                                    }}>
-                                        <div>This page has the following archived versions:</div>
-                                        {this.renderArchivedVersions()}
-                                    </div>
-                                }
+                                {this.renderArchivedVersions()}
                             </div>
                         }
-                        {page !== null &&
+                        {page !== undefined &&
                             <div id='Page' className='heruvia-text'>
                                 <Breadcrumbs 
                                     className='wikipage-breadcrumbs'
@@ -277,8 +259,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                     style={{ marginBottom: config.styles.spacing.default }}
                                 >
                                     {page.preface.length > 0 &&
-                                        <Grid 
-                                            item
+                                        <Grid item
                                             xs={page.details.length > 0 ? 7 : 12}
                                             className='wiki-preface heruvia-text'
                                             style={{ paddingRight: config.styles.spacing.default }}
@@ -287,24 +268,21 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                         </Grid>
                                     }
                                     {page.details.length > 0 &&
-                                        <Grid 
-                                            item 
-                                            xs={5}
-                                            className='wiki-details'
+                                        <Grid item xs={5} className='wiki-details'
                                             style={{
                                                 border: '1px solid ' + config.styles.colours.line,
                                                 padding: config.styles.spacing.default
                                             }}
                                         >
-                                            {this.renderDetails()}
+                                            {this.renderDetails(page.details)}
                                         </Grid>
                                     }
                                 </Grid>
                                 <div className='wiki-body heruvia-text'>{ReactHtmlParser(page.body)}</div>
                                 
-                                {this.state.page.images.other.length > 0 &&
-                                    <div style={{ marginTop: 60 }}>
-                                        <ImageGallery images={this.state.page.images.other} />
+                                {page.images.other.length > 0 &&
+                                    <div style={{ marginTop: 40 }}>
+                                        <ImageGallery images={page.images.other} />
                                     </div>
                                 }
                             </div>

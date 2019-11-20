@@ -1,11 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
+import striptags from 'striptags';
 
 import _ from '@lib/herulib';
+import FuzzySearch from '@lib/fuzzySearch';
 
 import config from '@config';
-import { DataSources } from '@enums';
+import { IStoreState, IEntry } from '@interfaces';
 
 import SearchBox from '@components/global/SearchBox';
 
@@ -22,7 +25,6 @@ import {
     Toolbar,
 } from '@material-ui/core';
 import {
-    Book as BookIcon,
     Chat as ChatIcon, 
     Menu as MenuIcon, 
     Public as PublicIcon,
@@ -33,12 +35,27 @@ interface IHeaderState {
     drawerOpen: boolean;
     searchDrawerOpen: boolean;
     searchTerm: string;
-    searchResults: any[];
+    searchResults: {
+        wiki: any[],
+        timeline: any[],
+    };
 }
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            wiki: store.wiki,
+            timeline: store.timeline
+        };
+    }
+)
 class Header extends React.Component<any, IHeaderState> {
 
     private searchTimer: any;
+    private searchers: { [key: string]: FuzzySearch } = {
+        wiki: new FuzzySearch(this.props.wiki.pages, ['title'], {sort: true}),
+        timeline: new FuzzySearch(this.props.timeline.entries, ['body'], {sort: true})
+    };
 
     constructor(props: any, state: IHeaderState) {
         super(props, state);
@@ -47,36 +64,27 @@ class Header extends React.Component<any, IHeaderState> {
             drawerOpen: false,
             searchDrawerOpen: false,
             searchTerm: '',
-            searchResults: [],
+            searchResults: {
+                wiki: [],
+                timeline: [],
+            },
         }
 
-        this.refreshSearch = this.refreshSearch.bind(this);
         this.toggleDrawer = this.toggleDrawer.bind(this);
         this.handleInputClick = this.handleInputClick.bind(this);
         this.handleSearchInput = this.handleSearchInput.bind(this);
         this.onSearchDrawerClose = this.onSearchDrawerClose.bind(this);
     }
 
-    componentDidMount() {
-        const WikiSourceConfig = this.props.WikiApiClient.getSourceConfig();
-
-        this.props.SearchApiClient.setSource(
-            WikiSourceConfig.name, 
-            WikiSourceConfig.files,
-            WikiSourceConfig.target,
-            WikiSourceConfig.props,
-        );
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.location.pathname !== prevProps.location.pathname) {
-            this.refreshSearch();
-        }
-    }
-
-    refreshSearch() {
-        const getAllPagesResponse = this.props.WikiApiClient.getAllPages();
-        this.props.SearchApiClient.refereshSource(DataSources.Wiki, getAllPagesResponse.data);
+    componentDidUpdate() {
+        const strippedTimeline = this.props.timeline.entries.map((entry: IEntry) => {
+            return {
+                ...entry,
+                body: striptags(entry.body)
+            }
+        });
+        if (this.props.wiki.pages.length > 0) this.searchers.wiki = new FuzzySearch(this.props.wiki.pages, ['title'], {sort: true});
+        if (strippedTimeline.length > 0) this.searchers.timeline = new FuzzySearch(strippedTimeline, ['body'], {sort: true});
     }
 
     toggleDrawer(): void {
@@ -91,18 +99,22 @@ class Header extends React.Component<any, IHeaderState> {
         const searchTerm = _.lang.normalizeString(e.currentTarget.value);
 
         this.searchTimer = setTimeout(() => {
-            const searchResults = searchTerm.length >= 2 ? this.props.SearchApiClient.getSearchResults(searchTerm) : [];
+            const wikiResults = searchTerm.length >= 2 ? this.searchers.wiki.search(searchTerm).slice(0,4) : [];
+            const timelineResults = searchTerm.length >= 2 ? this.searchers.timeline.search(searchTerm).slice(0,4) : [];
     
             this.setState({
                 searchTerm,
-                searchResults,
-                searchDrawerOpen: (searchResults.length > 0 ? true : false)
+                searchResults: {
+                    wiki: wikiResults,
+                    timeline: timelineResults,
+                },
+                searchDrawerOpen: (wikiResults.length > 0 || timelineResults.length > 0 ? true : false)
             });
         }, 100);
     }
 
     handleInputClick() : void {
-        if (this.state.searchResults.length > 0 && !this.state.searchDrawerOpen) {
+        if ((this.state.searchResults.wiki.length > 0 || this.state.searchResults.timeline.length) && !this.state.searchDrawerOpen) {
             this.setState({ searchDrawerOpen: true });
         }
     }
@@ -136,7 +148,16 @@ class Header extends React.Component<any, IHeaderState> {
                                     handleInputClick={this.handleInputClick}
                                     drawerOpen={this.state.searchDrawerOpen}
                                     drawerOnClose={this.onSearchDrawerClose}
-                                    searchResults={this.state.searchResults}
+                                    searchResults={[
+                                        {
+                                            name: 'timeline',
+                                            data: this.state.searchResults.timeline
+                                        },
+                                        {
+                                            name: 'encyclopaedia',
+                                            data: this.state.searchResults.wiki
+                                        },
+                                    ]}
                                 />
                             </Grid>
                         </Grid>

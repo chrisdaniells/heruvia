@@ -12,7 +12,7 @@ import {
 export interface IAlertProps {
     open: boolean;
     title?: string;
-    message?: string;
+    message?: string | JSX.Element[];
     close: {
         onClose: any;
         label: string;

@@ -1,17 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import _ from '@lib/herulib';
 
-import { SearchApiClient, WikiApiClient } from '@api';
-import { IDefaultResponse } from'@interfaces';
+import { PageListFilters } from '@enums';
+import { IStoreState, IStoreWikiState } from'@interfaces';
 import config from '@config';
 
-import {
-    Paper,
-    Tab,
-    Tabs,
-} from '@material-ui/core';
-import { PageListFilters } from '@enums';
+import { Paper, Tab, Tabs } from '@material-ui/core';
 
 import DisplayWrap from '@components/global/DisplayWrap';
 import PageList from '@components/wiki/PageList';
@@ -19,13 +15,12 @@ import CategoryTabs from '@components/wiki/CategoryTabs';
 import CreatePageButton from '@components/wiki/CreatePageButton';
 
 interface IWikiAppProps {
-    SearchApiClient: SearchApiClient;
-    WikiApiClient: WikiApiClient;
+    getPages?: any;
+    wiki?: IStoreWikiState;
 }
 
 interface IWikiAppState {
     selectedPagesTab: number;
-    pages: any[];
 }
 
 const paperStyles = {
@@ -38,16 +33,20 @@ const tabStyles = {
     fontSize: 15,
 }
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            wiki: store.wiki,
+        };
+    }
+)
 export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppState> {
 
     constructor(props: IWikiAppProps, state: IWikiAppState) {
         super(props, state);
 
-        const pagesResponse: IDefaultResponse = this.props.WikiApiClient.getAllPages();
-
         this.state = {
             selectedPagesTab: 0,
-            pages: pagesResponse.data,
         }
 
         this.handlePageTabChange = this.handlePageTabChange.bind(this);
@@ -59,7 +58,7 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
     }
 
     filterPages(filter: PageListFilters, quantity?: number) {
-        let pages = [ ...this.state.pages ];
+        let pages = [ ...this.props.wiki.pages ];
 
         switch(filter) {
             // TODO Move Sort Functions to Herulib
@@ -106,7 +105,7 @@ export default class WikiApp extends React.Component<IWikiAppProps, IWikiAppStat
                         onChange={this.handlePageTabChange}
                         aria-label='disabled tabs example'
                     >
-                        <Tab label={PageListFilters.All + ' (' + this.state.pages.length + ')'} style={tabStyles} />
+                        <Tab label={PageListFilters.All + ' (' + this.props.wiki.pages.length + ')'} style={tabStyles} />
                         <Tab label={PageListFilters.RecentlyModified} style={tabStyles} />
                         <Tab label={PageListFilters.RecentlyCreated} style={tabStyles} />
                         

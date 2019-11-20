@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Futura;
+    src: url(fonts/FuturaLT.ttf);
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -6,7 +11,8 @@ html, body {
 
 * {
     box-sizing: border-box;
-    font-family: Lora;
+    font-family: Calibri, sans-serif !important;
+    /* Futura, sans-serif !important */
 }
 
 .u-height-transition {
@@ -124,18 +130,21 @@ a:hover {
     font-size: 30px !important;
     border-bottom: 1px solid #d2d2d2 !important;
     padding-bottom: 10px !important;
-    margin: 20px 0 !important;
+    margin: 20px 0 10px !important;
 }
 
 .heruvia-text h2 {
     font-weight: normal !important;
     font-size: 24px !important;
-    margin: 20px 0 10px !important;
+    margin: 10px 0 5px !important;
 }
 
 .heruvia-text p {
     margin: 0 0 10px !important;
     line-height: 1.4 !important;
+}
+.heruvia-text p br {
+    display: none;
 }
 
 .heruvia-text a {
@@ -144,6 +153,10 @@ a:hover {
 }
 .heruvia-text a:hover {
     text-decoration: underline !important;
+}
+
+.heruvia-text ul {
+    margin: 0;
 }
 
 .heruvia-thumbnail {
@@ -177,9 +190,6 @@ a:hover {
 }
 .heruvia-timeline li:nth-of-type(odd) {
     background: #f1f1f1;
-}
-.heruvia-timeline li:nth-of-type(even) {
-
 }
 
 #Print.heruvia-text {

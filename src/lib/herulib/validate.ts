@@ -1,4 +1,4 @@
-import { IEntry } from '@interfaces';
+import { IEntry, IPage } from '@interfaces';
 import { AgeChar } from '@enums';
 
 export function Entry(entry: IEntry): { status: boolean, data: any } {
@@ -13,10 +13,20 @@ export function Entry(entry: IEntry): { status: boolean, data: any } {
     };
 }
 
+export function Page(page: IPage): string[] {
+    let errors: string[] = [];
+
+    if (page.title.length === 0) errors.push('Please enter a page title.');
+    if (page.category.length === 0) errors.push('Please select a page category.');
+    if (page.subcategory.length === 0) errors.push('Please select a page subcategory.');
+    if (page.body.length === 0) errors.push('Please enter a page body');
+
+    return errors;
+}
+
 export function CalDate(date: string): boolean {
     const units = date.split('-');
     if (units.length !== 3) return false;
-    console.log(units);
 
     // Age
     if (!Object.keys(AgeChar).some((char: string) => AgeChar[char as keyof AgeChar] === units[0][0].toLowerCase())) return false;

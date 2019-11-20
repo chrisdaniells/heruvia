@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 
-import { SearchApiClient, WikiApiClient, TimelineApiClient } from '@api';
+import { getTimeline } from '@store/actions/timelineActions';
 
 import _ from '@lib/herulib';
 import config from '@config';
@@ -30,44 +31,56 @@ import {
     Save as SaveIcon,
 } from '@material-ui/icons';
 
-import { IEntry, IPage } from '@interfaces';
+import { IEntry, IPage, IStoreState } from '@interfaces';
 import { SubCategories, AgeChar } from '@enums';
 
 interface ITimelineAppProps {
-    SearchApiClient: SearchApiClient;
-    WikiApiClient: WikiApiClient;
-    TimelineApiClient: TimelineApiClient;
+    timeline?: any;
+    getTimeline?: any;
+    wiki?: any;
+    location?: any;
 }
 
 interface ITimelineAppState {
-    entries: IEntry[];
-    currentEntry: IEntry;
+    newEntry: IEntry;
     editEntry?: IEntry;
-    quillFocus?: string | null;
     tags: any;
-    alert: IAlertProps
+    alert: IAlertProps;
+    newEntryExpanded: boolean;
 }
 
 const inputStyle = { marginBottom: config.styles.spacing.default };
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            timeline: store.timeline,
+            wiki: store.wiki,
+        };
+    },
+    (dispatch: any) => {
+        return {
+            getTimeline: () => dispatch(getTimeline()),
+        }
+    }
+)
 export default class TimelineApp extends React.Component<ITimelineAppProps, ITimelineAppState> {
 
     constructor(props: ITimelineAppProps, state: ITimelineAppState) {
         super(props, state);
 
         this.state = {
-            entries: this.props.TimelineApiClient.getTimeline().data,
-            currentEntry: { ...config.timeline.entry.blankEntry },
-            tags: this.props.WikiApiClient.getAllPages().data.map((page: IPage) => {
+            newEntry: { ...config.timeline.entry.blankEntry },
+            tags: this.props.wiki.pages.map((page: IPage) => {
                 return {
                     title: page.title,
                     normalized: _.lang.normalizeString(page.title),
                 };
             }),
             alert: { ...config.alert.blankAlert },
+            newEntryExpanded: false,
         };
 
-        this.handleFormChange = this.handleFormChange.bind(this);
         this.handleQuillFormChange = this.handleQuillFormChange.bind(this);
         this.onSave = this.onSave.bind(this);
         this.renderEditForm = this.renderEditForm.bind(this);
@@ -88,14 +101,14 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
     }
 
     handleDeleteConfirm(id: number) {
-        this.props.TimelineApiClient.deleteEntry(id);
-        this.setState({
-            entries: this.props.TimelineApiClient.getTimeline().data,
-            alert: { ...config.alert.blankAlert }
-        });
+        const updated = this.props.timeline.entries.filter((entry: IEntry) => entry.id !== id);
+        _.file.archiveFile(this.props.timeline.entries, 'timeline-' + Date.now() + '.json',  config.paths.timelineArchive);
+        _.file.saveFile(updated, config.paths.timeline + 'timeline.json');
+        
+        this.props.getTimeline();
+        this.setState({ alert: { ...config.alert.blankAlert } });
     }
 
-    // TODO Convert to generc set modal function
     onDelete(id: number) {
         this.setState({
             alert: {
@@ -106,13 +119,6 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
                 confirm: { onConfirm: () => this.handleDeleteConfirm(id), label: 'Yes' }
             }
         });
-    }
-
-    handleFormChange(e: any) {
-        const { name, value } = e.target;
-        let currentEntry = { ...this.state.currentEntry };
-        currentEntry[name] = value;
-        this.setState({ currentEntry });
     }
 
     handleQuillFormChange(editor: string, content: string) {
@@ -132,9 +138,9 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
         let entry: IEntry;
         let editor: string;
         if (type === 'create') {
-            entry = { ...this.state.currentEntry };
+            entry = { ...this.state.newEntry };
             entry.id = Date.now();
-            editor = 'currentEntry';
+            editor = 'newEntry';
         } else if (type === 'edit') {
             entry = { ...this.state.editEntry };
             editor = 'editEntry';
@@ -158,11 +164,27 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
             return;
         }
 
-        this.props.TimelineApiClient.updateTimeline(entry);
+        _.file.archiveFile(this.props.timeline.entries, 'timeline-' + Date.now() + '.json',  config.paths.timelineArchive);
+
+        let exists = false;
+        const updated = this.props.timeline.entries.map((e: IEntry) => {
+            if (e.id === entry.id) {
+                exists = true;
+                return entry;
+            } else {
+                return e;
+            }
+        });
+
+        if (!exists) updated.push(entry);
+
+        _.file.saveFile(updated, config.paths.timeline + 'timeline.json');
+
+        this.props.getTimeline();
         this.setState((state: ITimelineAppState) => {
             const newState = { ...state };
-            newState.entries = this.props.TimelineApiClient.getTimeline().data;
-            newState[editor] = { ...config.timeline.entry.blankEntry };
+            newState[editor] = editor === 'newEntry' ? { ...config.timeline.entry.blankEntry } : undefined;
+            newState.newEntryExpanded = editor === 'newEntry' ? !state.newEntryExpanded : state.newEntryExpanded;
             return newState;
         });
     }
@@ -170,18 +192,25 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
     // Use proper enums
     renderEditForm(area: 'create' | 'edit') {
         let editor;
-        if (area === 'create') { editor = 'currentEntry' }
+        if (area === 'create') { editor = 'newEntry' }
         else if (area === 'edit') { editor = 'editEntry' }
         else { return }
 
         return (
             <div>
                 <FormControl fullWidth style={inputStyle}>
-                    <InputLabel htmlFor='date'>Date</InputLabel>
+                    <InputLabel htmlFor={editor + '-date'}>Date</InputLabel>
                     <Input 
-                        name='date'
+                        name={editor + '-date'}
                         value={this.state[editor].date}
-                        onChange={(e) => { this.handleFormChange(e) }}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            this.setState((state: ITimelineAppState) => {
+                                const newState = { ...state };
+                                newState[editor].date = value;
+                                return newState;
+                            });
+                        }}
                     />
                 </FormControl>
                 <QuillEditor
@@ -261,7 +290,7 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
     }
 
     renderTimelineList(age: AgeChar) {
-        const filtered = _.cal.sortByDate(_.cal.filterEntriesByAge(this.state.entries, age));
+        const filtered = _.cal.sortByDate(_.cal.filterEntriesByAge(this.props.timeline.entries, age));
         const list = [];
 
         filtered.forEach((entry: IEntry, key: number) => {
@@ -280,7 +309,8 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
                 );
             } else {
                 list.push(
-                    <ListItem 
+                    <ListItem
+                        id={entry.date.replace('/', '_')}
                         button dense
                         key={entry.id}
                         style={{ color: config.styles.colours.text.default }}
@@ -300,8 +330,8 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
                                 </React.Fragment>}
                             onClick={() => {
                                 this.setState((state: ITimelineAppState) => {
-                                    const key = Object.keys(state.entries).find(key => state.entries[key].id === entry.id);
-                                    return { editEntry: JSON.parse(JSON.stringify(state.entries[key])) }
+                                    const key = Object.keys(this.props.timeline.entries).find(key => this.props.timeline.entries[key].id === entry.id);
+                                    return { editEntry: JSON.parse(JSON.stringify(this.props.timeline.entries[key])) }
                                 });
                             }}
                         />
@@ -316,7 +346,17 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
     render() {
         return (
             <div style={{ ...config.styles.container, marginTop: 100, }} id='Timeline'>
-                <ExpansionPanel square className='u-height-transition'>
+                <ExpansionPanel
+                    square
+                    className='u-height-transition'
+                    expanded={this.state.newEntryExpanded}
+                    onChange={() => this.setState((state: ITimelineAppState) => {
+                        return {
+                            ...state,
+                            newEntryExpanded: !state.newEntryExpanded
+                        }
+                    })}
+                >
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} id='add-entry'>Add Entry</ExpansionPanelSummary>
                     <ExpansionPanelDetails style={{ display: 'block' }}>{this.renderEditForm('create')}</ExpansionPanelDetails>
                 </ExpansionPanel>

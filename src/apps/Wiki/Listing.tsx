@@ -1,95 +1,49 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-import { WikiApiClient } from '@api';
-
-import { IPage } from '@interfaces';
+import { IPage, IStoreState, IStoreWikiState } from '@interfaces';
 
 import config from '@config';
 
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    IconButton,
-} from '@material-ui/core';
-import {
-    ArrowBack as BackIcon,
-    Home as HomeIcon,
-} from '@material-ui/icons';
+import { Card, CardContent, CardHeader, IconButton } from '@material-ui/core';
+import { ArrowBack as BackIcon, Home as HomeIcon } from '@material-ui/icons';
 
 import PageList from '@components/wiki/PageList';
 import CategoryTabs from '@components/wiki/CategoryTabs';
-import Alert, { IAlertProps } from '@components/global/Alert';
 
 interface IListingProps {
-    WikiApiClient: WikiApiClient;
-    match: any;
-    history: any;
-    location: any;
+    wiki?: IStoreWikiState;
+    getPages?: any;
+    match?: any;
+    location?: any;
+    history?: any;
 }
 
 interface IListingState {
-    pages: IPage[] | [];
-    alert: IAlertProps;
 }
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            wiki: store.wiki,
+        };
+    }
+)
 export default class Listing extends React.Component<IListingProps, IListingState> {
 
     constructor(props: IListingProps, state: IListingState) {
         super(props, state);
 
-        let alert: IAlertProps = { open: false, title: '', message: '', close: false, confirm: false };
-
-        this.fetchPages = this.fetchPages.bind(this);
-        this.resetAlert = this.resetAlert.bind(this);
+        this.getFilteredPages = this.getFilteredPages.bind(this);
         this.renderCategoryListing = this.renderCategoryListing.bind(this);
-
-        this.state = {
-            pages: [],
-            alert: alert,
-        };
     }
 
-    componentDidMount() {
-        this.fetchPages();
-    }
-
-    componentDidUpdate(prevProps: IListingProps) {
-        if (this.props.location.pathname !== prevProps.location.pathname) {
-            this.fetchPages();
-        }
-    }
-
-    fetchPages() {
-        const { params } = this.props.match;
-        const pageResponse = this.props.WikiApiClient.getPagesByAttribute(params.attribute, params.value);
-
-        let {pages, alert } = { ...this.state };
-
-        pages = pageResponse.status ? pageResponse.data : [];
-        alert = !pageResponse.status ? {
-            open: true,
-            title: 'List not found',
-            message: 'A list for ' + params.attribute + ' : ' + params.value + ' could not been found.',
-            close: {
-                onClose: this.resetAlert,
-                label: 'OK',
-            },
-            confirm: false,
-        } : alert;
-
-        this.setState({
-            pages,
-            alert,
-        });
-    }
-
-    resetAlert(): void {
-        this.setState (state => ({ alert: { ...state.alert, open: false } }), () => {
-            // Otherwise text disappears before dialog closes
-            setTimeout(() => { this.props.history.goBack() }, 50);
-        });
+    getFilteredPages(): IPage[] {
+        const attribute = this.props.match.params.attribute;
+        const value = this.props.match.params.value.toLowerCase();
+        return this.props.wiki.pages.filter((page: IPage) =>
+            page.hasOwnProperty(attribute) && page[attribute] === value);
     }
 
     renderCategoryListing() {
@@ -105,6 +59,7 @@ export default class Listing extends React.Component<IListingProps, IListingStat
    }
 
     render() {
+        const filteredPages = this.getFilteredPages();
         return(
             <div style={{ ...config.styles.container, marginTop: 100 }}>
                 <Card square style={{ marginBottom: config.styles.spacing.default }}>
@@ -119,18 +74,13 @@ export default class Listing extends React.Component<IListingProps, IListingStat
                         style={{ textTransform: 'capitalize' }}
                     />
                     <CardContent style={{ padding: config.styles.spacing.default }}>
-                        <PageList
-                            pages={this.state.pages}
-                            prefaceLength={300}
-                            edit={true}
-                        />
-                        <Alert
-                            open={this.state.alert.open}
-                            title={this.state.alert.title}
-                            message={this.state.alert.message}
-                            close={this.state.alert.close}
-                            confirm={this.state.alert.confirm}
-                        />
+                        {filteredPages.length > 0 &&
+                            <PageList pages={filteredPages} prefaceLength={300} edit={true} />
+                        }
+                        {filteredPages.length === 0 &&
+                            <div>No Pages Found.</div>
+                        }
+                        
                     </CardContent>
             </Card>
                 {this.renderCategoryListing()}

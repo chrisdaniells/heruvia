@@ -54,6 +54,7 @@ export function getAgeName(date: string) {
 }
 
 export function filterEntriesByAge(entries: IEntry[], age: AgeChar): IEntry[] {
+    if (entries.length === 0) return [];
     return entries.filter((entry: IEntry) => getAgeUnit(entry.date) === age);
 }
 

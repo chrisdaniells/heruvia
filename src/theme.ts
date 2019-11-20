@@ -12,6 +12,10 @@ export default createMuiTheme({
         }
     },
     typography: {
-        fontFamily: 'Lora',
+        fontFamily: 'Calibri, sans-serif !important',
+        // fontFamily: 'Futura, sans-serif !important',
+        body2: {
+            fontWeight: 300,
+        }
     }
 });

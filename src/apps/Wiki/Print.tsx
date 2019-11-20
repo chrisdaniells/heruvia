@@ -1,88 +1,50 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 
-import { WikiApiClient } from '@api';
+import { Breadcrumbs, Grid } from '@material-ui/core';
 
-import {
-    Breadcrumbs,
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    Grid,
-    IconButton,
-    List,
-    ListItem,
-} from '@material-ui/core';
-import {
-    ArrowBack as BackIcon,
-    Edit as EditIcon,
-    Home as HomeIcon,
-} from '@material-ui/icons';
-
-import Alert, { IAlertProps } from '@components/global/Alert';
-import CreatePageButton from '@components/wiki/CreatePageButton';
-import ImageGallery from '@components/global/ImageGallery';
-import { sanitizeLink } from '@components/global/QuillEditor';
-
-import { IPage } from '@interfaces';
+import { IPage, IDetailsItem, IStoreState } from '@interfaces';
 
 import config from '@config';
 
 interface IPageProps {
-    WikiApiClient: WikiApiClient;
     history: any;
     match: any;
     location: any;
+    wiki: any;
+    getPages?: any;
 }
 
-interface IPageState {
-    page: IPage | null;
-}
+interface IPageState {}
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            wiki: store.wiki,
+        };
+    }
+)
 export default class Page extends React.Component<IPageProps, IPageState> {
     constructor(props: IPageProps, state: IPageState) {
         super(props, state);
-
-        this.fetchPage = this.fetchPage.bind(this);
         this.renderDetails = this.renderDetails.bind(this);
-
-        this.state = {
-            page: null,
-        }
     }
 
     componentDidMount() {
-        this.fetchPage();
         document.getElementById('Header').style.display = 'none';
+        document.documentElement.style.backgroundColor = 'white';
     }
 
-    componentDidUpdate(prevProps: IPageProps) {
-        if (this.props.location.pathname !== prevProps.location.pathname) {
-            this.fetchPage();
-        }
-    }
+    renderDetails(details: IDetailsItem[]) {
+        const detailsItems: any[] = [];
 
-    fetchPage() {
-        if (!this.props.match.params.id) return;
-
-        const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
-        if (pageResponse.status) {
-            this.setState({ 
-                page: pageResponse.data,
-            });
-        }
-    }
-
-    renderDetails() {
-        const details: any[] = [];
-
-        this.state.page.details.forEach((detail: any, index: number) => {
+        details.forEach((detail: any, index: number) => {
             const isFirst = (index === 0);
-            const isLast = (this.state.page.details.length-1 === index);
+            const isLast = (details.length-1 === index);
 
-            details.push(
+            detailsItems.push(
                 <Grid
                     container 
                     key={detail.label + detail.value}
@@ -98,26 +60,23 @@ export default class Page extends React.Component<IPageProps, IPageState> {
             );
         });
 
-        return details;
+        return detailsItems;
     }
 
     render() {
+        const page = this.props.wiki.pages.find((page: IPage) => page.id === this.props.match.params.id);
+
+        if (page === undefined) return <div />;
+        
         window.print();
 
-        const page = this.state.page;
-
         return (
-            <div style={{
-                background: 'white',
-                padding: 20,
-            }}>
+            <div style={{ background: 'white', padding: 20 }}>
                 {page !== null &&
                     <div id='Print' className='heruvia-text'>
                         <Breadcrumbs 
                             className='wikipage-breadcrumbs'
-                            style={{
-                                marginBottom: config.styles.spacing.default
-                            }}
+                            style={{ marginBottom: config.styles.spacing.default }}
                         >
                             <Link 
                                 to={config.routes.wiki.list + '/category/' + page.category}
@@ -136,18 +95,14 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                         <Grid
                             container
                             alignItems='flex-start'
-                            style={{
-                                marginBottom: config.styles.spacing.default
-                            }}
+                            style={{ marginBottom: config.styles.spacing.default }}
                         >
                             {page.preface.length > 0 &&
                                 <Grid 
                                     item
                                     xs={page.details.length > 0 ? 7 : 12}
                                     className='wiki-preface heruvia-text'
-                                    style={{
-                                        paddingRight: config.styles.spacing.default
-                                    }}
+                                    style={{ paddingRight: config.styles.spacing.default }}
                                 >
                                     {ReactHtmlParser(page.preface)}
                                 </Grid>
@@ -162,7 +117,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                         padding: config.styles.spacing.default
                                     }}
                                 >
-                                    {this.renderDetails()}
+                                    {this.renderDetails(page.details)}
                                 </Grid>
                             }
                         </Grid>

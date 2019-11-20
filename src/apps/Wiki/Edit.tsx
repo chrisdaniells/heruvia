@@ -1,10 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 
-import { SearchApiClient, WikiApiClient } from '@api';
-import { IPage, IDetailsItem } from '@interfaces';
+import { IPage, IDetailsItem, IStoreState } from '@interfaces';
 import config from '@config';
+import _ from '@lib/herulib';
 
 import QuillEditor from '@components/global/QuillEditor';
 import DetailsInputList from '@components/wiki/DetailsInputList';
@@ -26,11 +27,11 @@ import {
 } from '@material-ui/icons';
 
 interface IEditProps {
-    SearchApiClient: SearchApiClient;
-    WikiApiClient: WikiApiClient;
     match?: any;
     history?: any;
     location?: any;
+    wiki?: any;
+    getPages?: any;
 }
 
 interface IEditState {
@@ -40,17 +41,41 @@ interface IEditState {
 
 const inputStyle = { marginBottom: config.styles.spacing.default }
 
+@connect(
+    (store: IStoreState) => {
+        return {
+            wiki: store.wiki,
+        };
+    }
+)
 export default class Edit extends React.Component<IEditProps, IEditState> {
     constructor(props: IEditProps, state: IEditState) {
         super(props, state);
 
-        let page: IPage = JSON.parse(JSON.stringify(this.props.WikiApiClient.getPageTemplate()));
-        let alert: IAlertProps = { open: false, title: '', message: '', close: false, confirm: false };
+        this.resetAlert = this.resetAlert.bind(this);
+        this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
+        this.handleFormChange = this.handleFormChange.bind(this);
+        this.handleDetailsFormChange = this.handleDetailsFormChange.bind(this);
+        this.handleQuillFormChange = this.handleQuillFormChange.bind(this);
+        this.handleImageUpload = this.handleImageUpload.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.renderFormMainImage = this.renderFormMainImage.bind(this);
+        this.renderFormTitle = this.renderFormTitle.bind(this);
+        this.renderFormCategorySubcategory = this.renderFormCategorySubcategory.bind(this);
+        this.renderFormDetails = this.renderFormDetails.bind(this);
+        this.renderFormQuill = this.renderFormQuill.bind(this);
+        this.renderFormOtherImages = this.renderFormOtherImages.bind(this);
+
+        let page: IPage = JSON.parse(JSON.stringify(_.wiki.getPageTemplate()));
+        let alert: IAlertProps = { ...config.alert.blankAlert };
 
         if (this.props.match.params.id !== undefined) {
-            const pageResponse = this.props.WikiApiClient.getPageById(this.props.match.params.id);
-            if (pageResponse.status) {
-                page = pageResponse.data;
+            const pageResponse = this.props.wiki.pages.find((p: IPage) =>
+                p.id === this.props.match.params.id);
+
+            if (pageResponse !== undefined) {
+                page = pageResponse;
                 if (!config.wiki.categories.hasOwnProperty(page.category)) {
                     page.category = '',
                     page.subcategory ='';
@@ -72,10 +97,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         } else if (this.props.location.search.length) {
             const parsed = queryString.parse(this.props.location.search);
             if (parsed.template) {
-                page = this.props.WikiApiClient.getPageTemplate(parsed.template as string);
+                page = _.wiki.getPageTemplate(parsed.template as string);
             }
             if (parsed.create) {
-                page.title = this.props.WikiApiClient.getPageTitleFromId(parsed.create as string);
+                page.title = _.wiki.getPageTitleFromId(parsed.create as string);
             }
         }
 
@@ -83,21 +108,6 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
             page,
             alert,
         };
-
-        this.resetAlert = this.resetAlert.bind(this);
-        this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
-        this.handleFormChange = this.handleFormChange.bind(this);
-        this.handleDetailsFormChange = this.handleDetailsFormChange.bind(this);
-        this.handleQuillFormChange = this.handleQuillFormChange.bind(this);
-        this.handleImageUpload = this.handleImageUpload.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
-        this.handleSave = this.handleSave.bind(this);
-        this.renderFormMainImage = this.renderFormMainImage.bind(this);
-        this.renderFormTitle = this.renderFormTitle.bind(this);
-        this.renderFormCategorySubcategory = this.renderFormCategorySubcategory.bind(this);
-        this.renderFormDetails = this.renderFormDetails.bind(this);
-        this.renderFormQuill = this.renderFormQuill.bind(this);
-        this.renderFormOtherImages = this.renderFormOtherImages.bind(this);
     }
 
     componentDidMount() {
@@ -109,18 +119,10 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     resetAlert(): void {
-        this.setState (state => ({ alert: { ...state.alert, open: false }}), () => {
+        this.setState(state => ({ alert: { ...state.alert, open: false }}), () => {
             // Otherwise text disappears before dialog closes
             setTimeout(() => {
-                this.setState(state => ({
-                    alert: {
-                        ...state.alert,
-                        title: '',
-                        message: '',
-                        close: false,
-                        confirm: false,
-                    }
-                }));
+                this.setState({ alert: { ...config.alert.blankAlert } });
             }, 100);
         });
     }
@@ -133,7 +135,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     handleDeleteConfirm() {
-        this.props.WikiApiClient.deletePageById(this.state.page.id);
+        _.file.deleteFile(config.paths.wikipages + this.state.page.id + '.json');
         this.props.history.push({ pathname: config.routes.wiki.root });
         location.reload(true);
     }
@@ -166,16 +168,16 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         let page = { ...this.state.page };
 
         const filepaths = Object.keys(files).map((key: number | string) => { return files[key].path });
-        const uploads = this.props.WikiApiClient.uploadImages(filepaths);
+        const uploads = _.file.uploadImages(filepaths, config.paths.images);
 
-        if (!uploads.status) return;
+        if (!uploads) return;
         
         switch(name) {
             case 'main-image':
-                page.images.main = uploads.data[0];
+                page.images.main = uploads[0];
                 break;
             case 'other-images':
-                page.images.other = [ ...page.images.other, ...uploads.data ];
+                page.images.other = [ ...page.images.other, ...uploads ];
                 break;
         }
         this.setState({ page });
@@ -194,11 +196,18 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     handleSave() {
-        const validation = this.props.WikiApiClient.validatePage(this.state.page);
+        const errors = _.val.Page(this.state.page);
 
-        if (!validation.status) {
-            const messages = validation.data.map(message => {
-                return <span key={message}>{message}</span>;
+        if (
+            this.state.page.id.length === 0
+            && this.props.wiki.pages.find((page: IPage) => page.title === this.state.page.title)
+        ) {
+            errors.push("A Page with this title already exists.");
+        }
+
+        if (errors.length !== 0) {
+            const messages = errors.map(message => {
+                return <p key={message}>{message}</p>;
             });
             this.setState({
                 alert: {
@@ -213,9 +222,21 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 }
             });
         } else {
-            this.props.WikiApiClient.updatePage(this.state.page, this.state.page.id.length === 0);
+            const page = { ...this.state.page };
+            if (page.id.length === 0) {
+                page.date_created = Date.now();
+            } else {
+                _.file.archiveFile(page, page.id, config.paths.wikiarchive, true);
+            }
+    
+            const newId = _.wiki.getPageIdFromTitle(page.title);
+            page.id = newId,
+            page.url = newId; 
+            page.last_updated = Date.now();
+
+            _.file.saveFile(page, config.paths.wikipages + page.id + '.json');
             this.props.history.push({ 
-                pathname: config.routes.wiki.page + '/' + this.props.WikiApiClient.getPageIdFromTitle(this.state.page.title)
+                pathname: config.routes.wiki.page + '/' + _.wiki.getPageIdFromTitle(this.state.page.title)
             });
         }
     }
@@ -289,40 +310,40 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
         let otherImages: any[] = [];
         this.state.page.images.other.forEach((image, index) => {
             otherImages.push(
-                    <div
-                        key={index}
-                        style={{
-                            position: 'relative',
-                            display: 'inline-block',
-                            verticalAlign: 'top',
-                            marginRight: config.styles.spacing.thin,
-                            marginBottom: config.styles.spacing.thin,
+                <div
+                    key={index}
+                    style={{
+                        position: 'relative',
+                        display: 'inline-block',
+                        verticalAlign: 'top',
+                        marginRight: config.styles.spacing.thin,
+                        marginBottom: config.styles.spacing.thin,
+                    }}
+                    >
+                    <img src={config.paths.images + '/' + image} style={{ width: 'auto', height: 150 }} />
+                    <IconButton 
+                        onClick={() => {
+                            let page = { ...this.state.page };
+                            page.images.other.splice(index, 1);
+                            this.setState({ page });
                         }}
-                        >
-                        <img src={config.paths.images + '/' + image} style={{ width: 'auto', height: 150 }} />
-                        <IconButton 
-                            onClick={() => {
-                                let page = { ...this.state.page };
-                                page.images.other.splice(index, 1);
-                                this.setState({ page });
-                            }}
-                            className='Wiki_IconOverlayBlend'
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                top: '44%',
-                                bottom: 0,
-                                margin: '0 auto',
-                                display: 'block',
-                                transform: 'translateY(-50%)',
-                                height: 48,
-                                width: 48,
-                            }}
-                        >
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
+                        className='Wiki_IconOverlayBlend'
+                        style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            top: '44%',
+                            bottom: 0,
+                            margin: '0 auto',
+                            display: 'block',
+                            transform: 'translateY(-50%)',
+                            height: 48,
+                            width: 48,
+                        }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </div>
             );
         });
 
@@ -447,43 +468,45 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     render() {
         return(
             <div style={{ ...config.styles.container, marginTop: 100 }}>
-                <Card square style={{ marginBottom: config.styles.spacing.default }}>
-                    <CardHeader
-                        action={
-                            <div>
-                                <IconButton onClick={this.props.history.goBack}><BackIcon /></IconButton>
-                                <IconButton component={Link} to={config.routes.wiki.root}><HomeIcon /></IconButton>
-                            </div>
-                        }
-                        title='Page Creator'
-                    />
-                    <CardContent style={{ padding: config.styles.spacing.default }}>
-                        {this.renderFormMainImage()}
-                        {this.renderFormTitle()}
-                        {this.renderFormCategorySubcategory()}
-                        {this.renderFormDetails()}
-                        {this.renderFormQuill('preface')}
-                        {this.renderFormQuill('body')}
-                        {this.renderFormOtherImages()}
-                    </CardContent>
-                    <CardActions style={{ marginBottom: config.styles.spacing.default }}>
-                        { this.state.page.id.length > 0 &&
-                            <IconButton onClick={this.handleDelete}><DeleteIcon /></IconButton>
-                        }
-                        <Button 
-                            onClick={this.handleSave}
-                            color='secondary'
-                            variant='contained'
-                            style={{ 
-                                margin: '0 ' + config.styles.spacing.thin + 'px 0 auto', 
-                                color: 'white',
-                                borderRadius: 0,
-                                fontSize: 13
-                            }}>
-                            <SaveIcon style={{ marginRight: config.styles.spacing.thin }} />Save
-                        </Button>
-                    </CardActions>
-                </Card>
+                {this.state.page !== null &&
+                    <Card square style={{ marginBottom: config.styles.spacing.default }}>
+                        <CardHeader
+                            action={
+                                <div>
+                                    <IconButton onClick={this.props.history.goBack}><BackIcon /></IconButton>
+                                    <IconButton component={Link} to={config.routes.wiki.root}><HomeIcon /></IconButton>
+                                </div>
+                            }
+                            title='Page Creator'
+                        />
+                        <CardContent style={{ padding: config.styles.spacing.default }}>
+                            {this.renderFormMainImage()}
+                            {this.renderFormTitle()}
+                            {this.renderFormCategorySubcategory()}
+                            {this.renderFormDetails()}
+                            {this.renderFormQuill('preface')}
+                            {this.renderFormQuill('body')}
+                            {this.renderFormOtherImages()}
+                        </CardContent>
+                        <CardActions style={{ marginBottom: config.styles.spacing.default }}>
+                            { this.state.page.id.length > 0 &&
+                                <IconButton onClick={this.handleDelete}><DeleteIcon /></IconButton>
+                            }
+                            <Button 
+                                onClick={this.handleSave}
+                                color='secondary'
+                                variant='contained'
+                                style={{ 
+                                    margin: '0 ' + config.styles.spacing.thin + 'px 0 auto', 
+                                    color: 'white',
+                                    borderRadius: 0,
+                                    fontSize: 13
+                                }}>
+                                <SaveIcon style={{ marginRight: config.styles.spacing.thin }} />Save
+                            </Button>
+                        </CardActions>
+                    </Card>
+                }
                 <Alert
                     open={this.state.alert.open}
                     title={this.state.alert.title}

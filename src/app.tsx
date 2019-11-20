@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+import { ConnectedRouter } from 'connected-react-router';
+import { Provider } from 'react-redux';
 import { ThemeProvider } from '@material-ui/styles';
 
 import theme from './theme';
 import config from './config';
 
-import { SearchApiClient, WikiApiClient, TimelineApiClient } from '@api';
+import { store, history } from '@store/store';
 
 import WikiApp from '@apps/Wiki';
 import WikiPage from '@apps/wiki/Page';
@@ -15,62 +17,44 @@ import WikiListing from '@apps/Wiki/Listing';
 import WikiPrint from '@apps/Wiki/Print';
 import TimelineApp from '@apps/Timeline';
 
-import ScrollToTop from '@components/global/ScrollToTop';
+import AppControl from '@components/global/AppControl';
 import Header from '@components/global/Header';
 
-const wikiApiClient = new WikiApiClient();
-const searchApiClient = new SearchApiClient();
-const timelineApiClient = new TimelineApiClient();
-
-const AppProps = {
-    WikiApiClient: wikiApiClient,
-    SearchApiClient: searchApiClient,
-    TimelineApiClient : timelineApiClient,
-}
 
 ReactDOM.render((
-    <ThemeProvider theme={theme}>
-        <Router>
-            <ScrollToTop>
-                <Header 
-                    WikiApiClient={wikiApiClient}
-                    SearchApiClient={searchApiClient}
-                />
-                <Switch>
-                    <Route
-                        path={config.routes.timeline.root}
-                        render={(props) => (<TimelineApp {...props} {...AppProps} />)}
-                    />
+    <Provider store={store}>
+        <ConnectedRouter history={history}>
+            <ThemeProvider theme={theme}>
+                <Router>
+                    <AppControl>
+                        <Header />
+                        <Switch>
+                            <Route path={config.routes.timeline.root} component={TimelineApp} />
 
-                    <Route
-                        path={config.routes.wiki.list + '/:attribute/:value'}
-                        render={(props) => (<WikiListing {...props} {...AppProps} />)}
-                    />
-                    <Route 
-                        path={config.routes.wiki.page + '/:id'}
-                        render={(props) => (<WikiPage {...props} {...AppProps} />)} 
-                    />
-                    <Route 
-                        path={config.routes.wiki.edit + '/:id?'}
-                        render={(props) => (<WikiEdit {...props} {...AppProps} />)} 
-                    />
-                    <Route 
-                        path={config.routes.wiki.print + '/:id'}
-                        render={(props) => (<WikiPrint {...props} {...AppProps} />)} 
-                    />
-                    <Route 
-                        exact 
-                        path={config.routes.wiki.root}
-                        render={(props) => (<WikiApp {...props} {...AppProps} />)} 
-                    />
-                    <Route
-                        exact
-                        path='/'
-                        render={(props) => (<WikiApp  {...props} {...AppProps} />)}
-                    />
-                    <Route render={(props) => (<WikiApp {...props} {...AppProps} />)} />
-                </Switch>
-            </ScrollToTop>
-        </Router>
-    </ThemeProvider>
+                            <Route
+                                path={config.routes.wiki.list + '/:attribute/:value'}
+                                component={WikiListing}
+                            />
+                            <Route 
+                                path={config.routes.wiki.page + '/:id'}
+                                component={WikiPage} 
+                            />
+                            <Route 
+                                path={config.routes.wiki.edit + '/:id?'}
+                                component={WikiEdit} 
+                            />
+                            <Route 
+                                path={config.routes.wiki.print + '/:id'}
+                                component={WikiPrint} 
+                            />
+                            <Route exact path={config.routes.wiki.root} component={WikiApp} />
+                            <Route exact path='/' component={WikiApp} />
+                            <Route component={WikiApp} />
+                        </Switch>
+                    </AppControl>
+                </Router>
+            </ThemeProvider>
+        </ConnectedRouter>
+    </Provider>
+    
 ), document.getElementById('app'));

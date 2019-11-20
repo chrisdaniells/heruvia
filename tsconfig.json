@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "outDir": "./dist/",
     "noImplicitAny": false,
     "module": "esnext",
@@ -20,6 +21,13 @@
       "@lib/*": ["lib/*"],
       "@root/*": ["./*"],
       "@store/*": ["store/*"],
-    }
-  }
+    },
+  },
+  "exclude": [
+    "node_modules",
+    "public"
+  ],
+  "include": [
+    "src/**/*"
+  ],
 }

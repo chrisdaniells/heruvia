@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { WikiApiClient } from '@api';
+import _ from '@lib/herulib';
 
 import { IPage } from '@interfaces';
 import config from '@config';
@@ -66,7 +66,7 @@ export default class PageList extends React.Component<IPageListProps, any> {
                                     variant='body2'
                                     color='textPrimary'
                                 >
-                                    {WikiApiClient.getReducedPrefaceText(page.preface, this.props.prefaceLength ? this.props.prefaceLength : 300)}
+                                    {_.text.getReducedPrefaceText(page.preface, this.props.prefaceLength ? this.props.prefaceLength : 300)}
                                 </Typography>
                             </React.Fragment>
                         }
