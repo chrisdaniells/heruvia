@@ -10,13 +10,12 @@ import { getPages } from '@store/actions/wikiActions';
 import {
     Breadcrumbs,
     Button,
-    Card,
-    CardContent,
-    CardHeader,
+    Card, CardContent, CardHeader,
     Grid,
     IconButton,
-    List,
-    ListItem,
+    List, ListItem,
+    Table, TableBody, TableCell, TableHead, TableRow,
+    Typography,
 } from '@material-ui/core';
 import {
     ArrowBack as BackIcon,
@@ -30,7 +29,7 @@ import CreatePageButton from '@components/wiki/CreatePageButton';
 import ImageGallery from '@components/global/ImageGallery';
 import { sanitizeLink } from '@components/global/QuillEditor';
 
-import { IPage, IDetailsItem, IStoreState } from '@interfaces';
+import { IPage, IDetailsItem, IStoreState, IEntry } from '@interfaces';
 
 import config from '@config';
 
@@ -39,6 +38,7 @@ interface IPageProps {
     match: any;
     location: any;
     wiki?: any;
+    timeline?: any;
     getPages: any;
 }
 
@@ -50,6 +50,7 @@ interface IPageState {
     (store: IStoreState) => {
         return {
             wiki: store.wiki,
+            timeline: store.timeline,
         };
     },
     (dispatch: any) => {
@@ -64,6 +65,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
 
         let alert: IAlertProps = { ...config.alert.blankAlert };
 
+        this.renderTimeline = this.renderTimeline.bind(this);
         this.renderDetails = this.renderDetails.bind(this);
         this.renderArchivedVersions = this.renderArchivedVersions.bind(this);
         this.restoreArchive = this.restoreArchive.bind(this);
@@ -105,6 +107,40 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                 this.setState({ alert: { ...config.alert.blankAlert }});
             }, 100);
         });
+    }
+
+    renderTimeline() {
+                
+        const timeline: any[] = [];
+        this.props.timeline.entries
+            .filter((entry: IEntry) => entry.tags.includes(this.props.match.params.id))
+            .forEach((entry: IEntry) => {
+                timeline.push(
+                    <TableRow key={entry.date}>
+                        <TableCell style={{ width: '20%'}}>{entry.date}</TableCell>
+                        <TableCell>{ReactHtmlParser(entry.body)}</TableCell>
+                    </TableRow>
+                );
+            });
+        
+        if (timeline.length > 0) {
+            return (
+                <div>
+                    <Typography variant="h1">Timeline</Typography>    
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell style={{ width: '20%'}}>Date</TableCell>
+                                <TableCell >Event</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {timeline}
+                        </TableBody>
+                    </Table>
+                </div>
+            );
+        }
     }
 
     renderDetails(details: IDetailsItem[]) {
@@ -278,6 +314,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                         </Grid>
                                     }
                                 </Grid>
+                                {this.renderTimeline()}
                                 <div className='wiki-body heruvia-text'>{ReactHtmlParser(page.body)}</div>
                                 
                                 {page.images.other.length > 0 &&

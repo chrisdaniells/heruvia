@@ -11,6 +11,7 @@
     "allowJs": true,
     "importHelpers": true,
     "baseUrl": "./src",
+    "skipLibCheck": true,
     "paths": {
       "@api": ["api/index"],
       "@apps/*": ["apps/*"],

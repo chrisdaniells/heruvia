@@ -147,6 +147,11 @@ a:hover {
     display: none;
 }
 
+.heruvia-text table td p {
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
 .heruvia-text a {
     color: #790101 !important;
     text-decoration: none !important;
