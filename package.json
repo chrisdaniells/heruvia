@@ -9,7 +9,7 @@
     "build": "webpack --progress",
     "watch": "webpack --watch --progress",
     "bs": "webpack && npm start",
-    "package": "webpack --config webpack.prod.js && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite",
+    "package": "webpack --config webpack.prod.js && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite"
   },
   "author": "Christopher Daniells",
   "license": "ISC",
