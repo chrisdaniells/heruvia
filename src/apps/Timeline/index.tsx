@@ -164,7 +164,7 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
             return;
         }
 
-        _.file.archiveFile(this.props.timeline.entries, 'timeline-' + Date.now() + '.json',  config.paths.timelineArchive);
+        _.file.archiveFile(entry, 'timeline-entry-' + entry.date.replace('/', '-') + "-" + Date.now(),  config.paths.timelineArchive);
 
         let exists = false;
         const updated = this.props.timeline.entries.map((e: IEntry) => {

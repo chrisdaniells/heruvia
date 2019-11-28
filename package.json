@@ -9,9 +9,7 @@
     "build": "webpack --progress",
     "watch": "webpack --watch --progress",
     "bs": "webpack && npm start",
-    "package": "npm run build && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite",
-    "ub": "babel src/apps/Languages/generators/Ussurian -d lib --extensions \".ts\" && node lib/generate.js",
-    "u": "node lib/generate.js"
+    "package": "webpack --config webpack.prod.js && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite",
   },
   "author": "Christopher Daniells",
   "license": "ISC",
