@@ -27,18 +27,20 @@ export function deleteFile(filepath: string): boolean {
 export function archiveFile(data: any, filename: string, path: string, push: boolean = false): boolean {
     const fileToArchive = path + filename + '.json';
 
+    let archiveData = [];
+
     if (push) {
         if (fs.existsSync(fileToArchive)) {
-            const currentData = JSON.parse(fs.readFileSync(fileToArchive, 'utf8'));
-            if (!Array.isArray(currentData)) return false;
-            data = [...data, ...currentData];
+            archiveData = JSON.parse(fs.readFileSync(fileToArchive, 'utf8'));
+            if (!Array.isArray(archiveData)) return false;
+            archiveData.push(data);
         } else {
-            data = [data];
+            archiveData = [data];
         }
     }
 
     try {
-        fs.writeFileSync(fileToArchive, JSON.stringify(data));
+        fs.writeFileSync(fileToArchive, JSON.stringify(archiveData));
         return true;
     } catch {
         return false;

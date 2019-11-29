@@ -1,6 +1,4 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const PATHS = {
     app: './app.tsx',
@@ -42,15 +40,7 @@ module.exports = {
         hints: false
     },
     optimization: {
-        minimizer: [new UglifyJsPlugin()],
         usedExports: true,
-    },
-    plugins: [
-        //new HardSourceWebpackPlugin()
-    ],
-    externals: {
-        //fs: 'fs',
-        //path: 'path'
     },
     node: {
         __dirname: false,

@@ -1,0 +1,219 @@
+@font-face {
+    font-family: Futura;
+    src: url(fonts/FuturaLT.ttf);
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #f1f1f1;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Calibri, sans-serif !important;
+    /* Futura, sans-serif !important */
+}
+
+.u-height-transition {
+    transition: maxHeight .3s ease-in-out;
+}
+
+a:hover {
+    color: #790101 !important;
+}
+
+/* GLOBAL OVERRIDES */
+.MuiButton-label {
+    font-family: "Futura LT";
+    font-size: 15px;
+    line-height: 15px;
+    letter-spacing: 1px;
+}
+
+/* QUILL OVERRIDES */
+.ql-toolbar {
+    border: none !important;
+    border-bottom: 1px solid #ccc !important;
+}
+.ql-toolbar button:hover, 
+.ql-toolbar .ql-picker-label:hover,
+.ql-toolbar .ql-picker-item:hover,
+.ql-toolbar button.ql-active,
+.ql-toolbar .ql-picker-label.ql-active,
+.ql-toolbar .ql-picker-options .ql-picker-item.ql-selected
+{
+    color: #790101 !important;
+}
+.ql-toolbar button:hover .ql-stroke,
+.ql-toolbar button:active .ql-stroke,
+.ql-toolbar .ql-picker-label:hover .ql-stroke,
+.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-toolbar button.ql-active .ql-stroke
+{
+    stroke: #790101 !important;
+}
+.ql-container {
+    border: none !important;
+}
+.ql-editor {
+    font-size: 16px !important;
+    padding: 7px 0 7px !important;
+    resize: vertical;
+    min-height: 150px;
+    max-height: 600px;
+}
+
+.type-inline .ql-editor {
+    max-height: 250px !important;
+}
+
+#preface.ql-formats:nth-of-type(1),
+#preface.ql-formats:nth-of-type(3)
+ {
+    display: none !important;
+    margin: 0 !important;
+}
+
+.ql-picker {
+    min-width: 30px;
+}
+.ql-picker .ql-picker-label {
+    border-color: #ccc !important;
+}
+.ql-picker.ql-symbol .ql-picker-item[data-label]:not([data-label=''])::before,
+.ql-picker.ql-consonant .ql-picker-item[data-label]:not([data-label=''])::before,
+.ql-picker.ql-vowel .ql-picker-item[data-label]:not([data-label=''])::before {
+    content: attr(data-label);
+}
+
+/* WIKI OVERRIDES */
+.Wiki_CreatePageButton {
+    color: white !important;
+}
+.Wiki_CreatePageButton:hover {
+    color: white !important;
+}
+.Wiki_IconOverlayBlend {
+    color: white !important;
+    background: rgba(0,0,0,0.2) !important;
+}
+.Wiki_IconOverlayBlend:hover {
+    background: rgba(0,0,0,0.4) !important;
+}
+.Wiki_Page_Title {
+    text-transform: capitalize !important;
+}
+.Wiki_Page_Title span {
+    font-size: 40px !important;
+}
+
+/* TIMELINE OVERRIDES */
+
+.Timeline_Title {
+    text-transform: capitalize !important;
+}
+.Timeline_Title span {
+    font-size: 30px !important;
+}
+
+#Timeline .entry-description {
+    color: black !important;
+}
+#Timeline .entry-description p {
+    margin: 0 !important;
+}
+
+/* HTML TEXT STYLES */
+.heruvia-text h1 {
+    font-weight: normal !important;
+    font-size: 30px !important;
+    border-bottom: 1px solid #d2d2d2 !important;
+    padding-bottom: 10px !important;
+    margin: 20px 0 10px !important;
+}
+
+.heruvia-text h2 {
+    font-weight: normal !important;
+    font-size: 24px !important;
+    margin: 10px 0 5px !important;
+}
+
+.heruvia-text p {
+    margin: 0 0 10px !important;
+    line-height: 1.4 !important;
+}
+.heruvia-text p br {
+    display: none;
+}
+
+.heruvia-text table td p {
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
+.heruvia-text a {
+    color: #790101 !important;
+    text-decoration: none !important;
+}
+.heruvia-text a:hover {
+    text-decoration: underline !important;
+}
+
+.heruvia-text ul {
+    margin: 0;
+}
+
+.heruvia-thumbnail {
+    display: inline-block;
+    border-bottom: 1px solid #d2d2d2;
+    padding-bottom: 10px;
+    margin: 10px 10px 0 0;
+    cursor: pointer;
+}
+.heruvia-thumbnail:hover {
+    display: inline-block;
+    border-bottom: 1px solid #000;
+    padding-bottom: 10px;
+    margin: 10px 10px 0 0;
+}
+.heruvia-thumbnail img {
+    height: 100px;
+    width: auto;
+    max-width: 100%;
+}
+
+.heruvia-timeline {
+    border: 1px solid #d2d2d2;
+    padding: 5px !important;
+}
+.heruvia-timeline li {
+    padding: 10px;
+}
+.heruvia-timeline li::before {
+    display: none !important;
+}
+.heruvia-timeline li:nth-of-type(odd) {
+    background: #f1f1f1;
+}
+
+#Print.heruvia-text {
+    font-size: 13px;
+}
+
+#Print.heruvia-text a {
+    color: black !important;
+}
+
+#Print.heruvia-text h1 {
+    font-size: 24px !important;
+    border-bottom: 1px solid #d2d2d2 !important;
+    padding-bottom: 10px !important;
+    margin: 20px 0 !important;
+}
+
+#Print.heruvia-text h2 {
+    font-weight: normal !important;
+    font-size: 20px !important;
+    margin: 20px 0 10px !important;
+}
