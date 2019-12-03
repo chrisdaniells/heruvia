@@ -1,4 +1,5 @@
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const PATHS = {
     app: './app.tsx',
@@ -36,8 +37,13 @@ module.exports = {
             "@store": path.join(__dirname, './src/store'),
         },
     },
+    plugins: [
+        new CleanWebpackPlugin({
+            cleanOnceBeforeBuildPatterns: ['bundle.js', 'bundle.js.map']
+        }),
+    ],
     performance: {
-        hints: false
+        hints: "warning"
     },
     optimization: {
         usedExports: true,
@@ -46,11 +52,5 @@ module.exports = {
         __dirname: false,
         __filename: false
     },
-    watchOptions: {
-        aggregateTimeout: 300,
-        poll: 1000,
-        ignored: /node_modules/
-    },
-    mode: "development",
     target: 'electron-renderer',
 }

@@ -26,6 +26,7 @@ export function normalizeCharacter(char: string) {
 }
 
 export function normalizeString(string: string) {
+    if (!string || typeof string !== "string") return;
     const newString = [...string].map((char) => normalizeCharacter(char)).join('');
     return newString;
 }
