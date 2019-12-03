@@ -194,7 +194,7 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                         {this.getToolbar()}
                         <ReactQuill
                             id={this.props.id}
-                            className={'heruvia-text' + this.props.toolbar ? ' type-' + this.props.toolbar : ''}
+                            className={'heruvia-text' + (this.props.toolbar ? ' type-' + this.props.toolbar : '')}
                             value={this.props.value}
                             onChange={(content) => { this.props.onChange(this.props.id, content) }}
                             modules={this.modules}

@@ -10,7 +10,7 @@
     "build:prod": "webpack --progress --config webpack.prod.js",
     "watch": "webpack --watch --progress",
     "bs": "webpack && npm start",
-    "package": "npm run build && electron-packager . --ignore=^/src --icon=public/heru.ico --overwrite"
+    "package": "npm run build && electron-packager . --ignore=^/src --ignore=^/package-lock.json --ignore=^/package.json --ignore=^/webpack* --icon=public/heru.ico --overwrite"
   },
   "author": "Christopher Daniells",
   "license": "ISC",
@@ -52,5 +52,16 @@
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.6",
     "webpack-merge": "^4.2.2"
-  }
+  },
+  "electronignore": [
+    "src",
+    "node_modules",
+    ".babelrc",
+    "package-lock.json",
+    "package-lock",
+    "tsconfig.json",
+    "webpack.common.js",
+    "webpack.dev.js",
+    "webpack.prod.js"
+  ]
 }

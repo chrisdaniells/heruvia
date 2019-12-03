@@ -35,6 +35,8 @@ module.exports = {
             "@interfaces": path.join(__dirname, './src/interfaces'),
             "@lib": path.join(__dirname, './src/lib'),
             "@store": path.join(__dirname, './src/store'),
+            "@material-ui/icons": path.join(__dirname, "./node_modules", "@material-ui/icons"),
+            "@material-ui/core": path.join(__dirname, "./node_modules", "@material-ui/core"),
         },
     },
     plugins: [
