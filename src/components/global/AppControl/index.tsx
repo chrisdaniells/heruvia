@@ -32,6 +32,10 @@ class ScrollToTop extends React.Component<any, any> {
       this.props.getTimeline();
     }
 
+    componentDidMount() {
+      document.getElementById("loader").remove();
+    }
+
     componentDidUpdate(prevProps) {
       if (this.props.location !== prevProps.location) {
         this.hydrateStore();
