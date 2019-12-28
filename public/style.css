@@ -164,6 +164,7 @@ a:hover {
 .heruvia-text p {
     margin: 0 0 10px !important;
     line-height: 1.4 !important;
+    min-height: 10px;
 }
 .heruvia-text p br {
     display: none;

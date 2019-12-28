@@ -461,7 +461,7 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 formStyles={inputStyle}
                 isFocused={isFocused}
                 onChange={this.handleQuillFormChange}
-                toolbar='inline'
+                toolbar={editor === 'preface' ? 'inline' : undefined}
             />
         );
     }
