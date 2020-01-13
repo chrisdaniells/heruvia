@@ -213,17 +213,9 @@ export function sanitizeLink(url, stripHash: boolean = false) {
             url = url.replace('?', '');
             url = (!stripHash ? '#' : '') + config.routes.wiki.page + '/' + url.trim().replace(/\s+/g, '_');
             break;
-        case '!':
-            url = url.replace('!', '');
-            url = (!stripHash ? '#' : '') + config.routes.language.page + '/' + url.trim().replace(/\s+/g, '_');
-            break;
         case '@':
             url = url.replace('@', '');
-            url = (!stripHash ? '#' : '') + config.routes.timeline.page + '/' + url.trim().replace(/\s+/g, '_');
-            break;
-        case '&':
-            url = url.replace('&', '');
-            url = (!stripHash ? '#' : '') + config.routes.todo.page + '/' + url.trim().replace(/\s+/g, '_');
+            url = (!stripHash ? '#' : '') + config.routes.timeline.scroll + url.trim().replace(/\s+/g, '_');
             break;
     }
 

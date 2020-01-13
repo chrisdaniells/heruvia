@@ -117,7 +117,9 @@ export default class Page extends React.Component<IPageProps, IPageState> {
             .forEach((entry: IEntry) => {
                 timeline.push(
                     <TableRow key={entry.date}>
-                        <TableCell style={{ width: '20%'}}>{entry.date}</TableCell>
+                        <TableCell style={{ width: '20%'}}>
+                            <Link to={config.routes.timeline.scroll + entry.date}>{entry.date}</Link>
+                        </TableCell>
                         <TableCell>{ReactHtmlParser(entry.body)}</TableCell>
                     </TableRow>
                 );

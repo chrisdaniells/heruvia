@@ -25,6 +25,7 @@ const config: { [key: string] : any } = {
         },
         timeline: {
             root: '/timeline',
+            scroll: '/timeline?scroll=',
         },
     },
     wiki: {

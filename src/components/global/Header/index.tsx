@@ -96,7 +96,7 @@ class Header extends React.Component<any, IHeaderState> {
 
     handleSearchInput(e: any): void {
         clearTimeout(this.searchTimer);
-        const searchTerm = _.lang.normalizeString(e.currentTarget.value);
+        const searchTerm = _.lang.normalizeString(e.currentTarget.value) + "";
 
         this.searchTimer = setTimeout(() => {
             const wikiResults = searchTerm.length >= 2 ? this.searchers.wiki.search(searchTerm).slice(0,4) : [];
