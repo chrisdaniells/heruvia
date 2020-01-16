@@ -146,6 +146,14 @@ a:hover {
     margin: 0 !important;
 }
 
+#Timeline .entry-description a {
+    color: #790101;
+    text-decoration: none;
+}
+#Timeline .entry-description a:hover {
+    text-decoration: underline;
+}
+
 /* HTML TEXT STYLES */
 .heruvia-text h1 {
     font-weight: normal !important;
