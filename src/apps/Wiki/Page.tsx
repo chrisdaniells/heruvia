@@ -109,11 +109,10 @@ export default class Page extends React.Component<IPageProps, IPageState> {
         });
     }
 
-    renderTimeline() {
-                
+    renderTimeline(tagId: string) {
         const timeline: any[] = [];
         this.props.timeline.entries
-            .filter((entry: IEntry) => entry.tags.includes(this.props.match.params.id))
+            .filter((entry: IEntry) => entry.tags.includes(tagId))
             .forEach((entry: IEntry) => {
                 timeline.push(
                     <TableRow key={entry.date}>
@@ -316,7 +315,7 @@ export default class Page extends React.Component<IPageProps, IPageState> {
                                         </Grid>
                                     }
                                 </Grid>
-                                {this.renderTimeline()}
+                                {this.renderTimeline(page.title)}
                                 <div className='wiki-body heruvia-text'>{ReactHtmlParser(page.body)}</div>
                                 
                                 {page.images.other.length > 0 &&

@@ -230,6 +230,11 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
             }
     
             const newId = _.wiki.getPageIdFromTitle(page.title);
+
+            if (newId !== page.id) {
+                _.file.deleteFile(config.paths.wikipages + page.id + '.json');
+            }
+
             page.id = newId,
             page.url = newId; 
             page.last_updated = Date.now();
