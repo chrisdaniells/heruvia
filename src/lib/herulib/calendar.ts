@@ -31,7 +31,8 @@ export function dateToTimeStamp(date) {
         case AgeChar.TheAgeOfAwakening: ageNum= 5;  break;
     }
 
-    const stringDate = (ageNum + year + moonYear + month + day).toString();
+    const stringDate = (ageNum + year.padStart(4, '0') + moonYear.padStart(3, '0') + month.padStart(2, '0') + day.padStart(2, '0')).toString();
+    console.log(stringDate);
     return parseInt(stringDate);
 }
 
