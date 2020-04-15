@@ -1,7 +1,7 @@
 import React from 'react';
 
 import SearchDrawer from '@components/global/SearchBox/SearchDrawer';
-import ResultsTray from '@components/global/SearchBox/ResultsTray';
+import SearchResults from '@components/global/SearchBox/SearchResults';
 
 import {
     InputAdornment,
@@ -50,7 +50,10 @@ export default class SearchBox extends React.Component<ISearchBoxProps, any> {
                     onOpen={() => {}}
                     onClose={this.props.drawerOnClose}
                 >
-                    <ResultsTray searchResults={this.props.searchResults} />
+                    <SearchResults
+                        searchResults={this.props.searchResults}
+                        drawerOnClose={this.props.drawerOnClose}
+                    />
                 </SearchDrawer>
             </div>
         )

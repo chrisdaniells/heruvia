@@ -111,11 +111,11 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
     }
 
     componentDidMount() {
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+        document.addEventListener('save-wiki', this.handleSave);
     }
 
     componentWillUnmount() {
-        document.removeEventListener('keydown', this.handleKeyDown);
+        document.removeEventListener('save-wiki', this.handleSave);
     }
 
     resetAlert(): void {
@@ -125,13 +125,6 @@ export default class Edit extends React.Component<IEditProps, IEditState> {
                 this.setState({ alert: { ...config.alert.blankAlert } });
             }, 100);
         });
-    }
-
-    handleKeyDown(e: any) {
-        if (!(e.key === 's' && e.ctrlKey)) return true;
-        e.preventDefault();
-        this.handleSave();
-        return false;
     }
 
     handleDeleteConfirm() {

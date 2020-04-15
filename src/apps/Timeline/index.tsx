@@ -89,6 +89,13 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
         this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
     }
 
+    componentDidMount() {
+        document.addEventListener('save-timeline', () => this.onSave(this.state.newEntryExpanded ? 'create' : 'edit'));
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('save-timeline', () => this.onSave(this.state.newEntryExpanded ? 'create' : 'edit'));
+    }
     resetAlert(): void {
         this.setState (state => ({ alert: { ...state.alert, open: false }}),() => {
             // Otherwise text disappears before dialog closes
@@ -148,7 +155,7 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
 
         const validation = _.val.Entry(entry);
         if (!validation.status) {
-            const messages = validation.data.map(message => <span key={message}>{message}</span>);
+            const messages = validation.data.map(message => <p key={message}>{message}</p>);
             this.setState({
                 alert: {
                     open: true,
@@ -314,6 +321,12 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
                         button dense
                         key={entry.id}
                         style={{ color: config.styles.colours.text.default }}
+                        onClick={() => {
+                            this.setState((state: ITimelineAppState) => {
+                                const key = Object.keys(this.props.timeline.entries).find(key => this.props.timeline.entries[key].id === entry.id);
+                                return { editEntry: JSON.parse(JSON.stringify(this.props.timeline.entries[key])) }
+                            });
+                        }}
                     > 
                         <ListItemText
                             disableTypography
@@ -328,12 +341,6 @@ export default class TimelineApp extends React.Component<ITimelineAppProps, ITim
                                         <div className='entry-description'>{ReactHtmlParser(entry.body)}</div>
                                     </Typography>
                                 </React.Fragment>}
-                            onClick={() => {
-                                this.setState((state: ITimelineAppState) => {
-                                    const key = Object.keys(this.props.timeline.entries).find(key => this.props.timeline.entries[key].id === entry.id);
-                                    return { editEntry: JSON.parse(JSON.stringify(this.props.timeline.entries[key])) }
-                                });
-                            }}
                         />
                     </ListItem>
                 );

@@ -111,18 +111,18 @@ export default class Page extends React.Component<IPageProps, IPageState> {
 
     renderTimeline(tagId: string) {
         const timeline: any[] = [];
-        this.props.timeline.entries
-            .filter((entry: IEntry) => entry.tags.includes(tagId))
-            .forEach((entry: IEntry) => {
-                timeline.push(
-                    <TableRow key={entry.date}>
-                        <TableCell style={{ width: '20%'}}>
-                            <Link to={config.routes.timeline.scroll + entry.date}>{entry.date}</Link>
-                        </TableCell>
-                        <TableCell>{ReactHtmlParser(entry.body)}</TableCell>
-                    </TableRow>
-                );
-            });
+        const entries = _.cal.sortByDate(this.props.timeline.entries.filter((entry: IEntry) => entry.tags.includes(tagId)));
+
+        entries.forEach((entry: IEntry) => {
+            timeline.push(
+                <TableRow key={entry.date}>
+                    <TableCell style={{ width: '20%'}}>
+                        <Link to={config.routes.timeline.scroll + entry.date}>{entry.date}</Link>
+                    </TableCell>
+                    <TableCell>{ReactHtmlParser(entry.body)}</TableCell>
+                </TableRow>
+            );
+        });
         
         if (timeline.length > 0) {
             return (

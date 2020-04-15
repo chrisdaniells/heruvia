@@ -32,7 +32,6 @@ export function dateToTimeStamp(date) {
     }
 
     const stringDate = (ageNum + year.padStart(4, '0') + moonYear.padStart(3, '0') + month.padStart(2, '0') + day.padStart(2, '0')).toString();
-    console.log(stringDate);
     return parseInt(stringDate);
 }
 

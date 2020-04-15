@@ -24,6 +24,7 @@ class ScrollToTop extends React.Component<any, any> {
         super(props);
 
         this.hydrateStore = this.hydrateStore.bind(this);
+
         this.hydrateStore();
     }
 
@@ -32,8 +33,36 @@ class ScrollToTop extends React.Component<any, any> {
       this.props.getTimeline();
     }
 
+    setShortcutListeners(e: any) {
+      const SaveWikiEvent = new Event('save-wiki');
+      const SaveTimelineEvent = new Event('save-timeline');
+
+      if (this.props.location.pathname.includes('/wiki')) {
+        // Save
+        if (e.key === 's' && e.ctrlKey) {
+          e.preventDefault();
+          document.dispatchEvent(SaveWikiEvent);
+          return false;
+        }
+      } else if (this.props.location.pathname.includes('/timeline')) {
+        //Save
+        if (e.key === 's' && e.ctrlKey) {
+          e.preventDefault();
+          document.dispatchEvent(SaveTimelineEvent);
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     componentDidMount() {
       document.getElementById("loader").remove();
+      document.addEventListener('keydown', this.setShortcutListeners.bind(this));
+    }
+
+    componentWillUnmount() {
+      document.removeEventListener('keydown', this.setShortcutListeners);
     }
 
     componentDidUpdate(prevProps) {

@@ -25,6 +25,7 @@ interface IPageListProps {
     pages: IPage[],
     prefaceLength?: number,
     edit?: boolean,
+    itemOnClick?: any;
 }
 
 export default class PageList extends React.Component<IPageListProps, any> {
@@ -48,6 +49,7 @@ export default class PageList extends React.Component<IPageListProps, any> {
                     style={{
                         color: config.styles.colours.text.default
                     }}
+                    onClick={() => { this.props.itemOnClick ? this.props.itemOnClick() : '' }}
                 >
                     <ListItemAvatar>
                         {page.images.main.length > 0 ?

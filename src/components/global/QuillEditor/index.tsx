@@ -66,7 +66,91 @@ export default class QuillEditor extends React.Component<IQuillEditorProps, any>
                           this.quill.format('indent', false, 'user');
                         }
                     }
-                }
+                },
+                ethCharLowercase: {
+                    key: 68,
+                    altKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, 'ð');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                ethCharUppercase: {
+                    key: 68,
+                    altKey: true,
+                    shiftKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, 'Đ');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                shCharLowercase: {
+                    key: 83,
+                    altKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, 'ş');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                shCharUppercase: {
+                    key: 83,
+                    altKey: true,
+                    shiftKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, 'Ş');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                thornCharLowercase: {
+                    key: 84,
+                    altKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, 'þ');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                thornCharUppercase: {
+                    key: 84,
+                    altKey: true,
+                    shiftKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, 'Ћ');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                doubleArrowSymbol: {
+                    key: 190,
+                    altKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, '»');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                femaleSymbol: {
+                    key: 70,
+                    altKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, '♀');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
+                maleSymbol: {
+                    key: 77,
+                    altKey: true,
+                    handler: function() {
+                        const cursorPosition = this.quill.getSelection().index;
+                        this.quill.insertText(cursorPosition, '♂');
+                        this.quill.setSelection(cursorPosition + 1);
+                    } 
+                },
             }
         }
     }
